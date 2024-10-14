@@ -3,14 +3,18 @@ services:
   frontend:
     build: 
       dockerfile: frontend/Dockerfile
+      target: $STAGE
     container_name: frontend
     ports:
       - "3000:3000"
     volumes:
       - ./debug/frontend/:/debug
+    environment:
+      - GID=$USER_GID
   backend:
     build: 
       dockerfile: backend/Dockerfile
+      target: $STAGE
     container_name: backend
     ports:
       - "8000:8000"
@@ -19,6 +23,7 @@ services:
     depends_on:
       - db
     environment:
+      - GID=$USER_GID
       - DJANGO_SUPERUSER_PASSWORD=$DJANGO_PASS
       - DJANGO_SUPERUSER_EMAIL=$DJANGO_EMAIL
       - DJANGO_SUPERUSER_USERNAME=$DJANGO_USERNAME
