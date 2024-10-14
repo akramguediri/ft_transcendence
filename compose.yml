@@ -18,6 +18,10 @@ services:
       - ./debug/backend/:/debug
     depends_on:
       - db
+    environment:
+      - DJANGO_SUPERUSER_PASSWORD=$DJANGO_PASS
+      - DJANGO_SUPERUSER_EMAIL=$DJANGO_EMAIL
+      - DJANGO_SUPERUSER_USERNAME=$DJANGO_USERNAME
   db:
     build: 
       dockerfile: db/Dockerfile
