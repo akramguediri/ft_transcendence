@@ -1,0 +1,75 @@
+#!/bin/bash
+
+function handle_ctrlc() {
+    echo
+    if [[ $ctrlc_received == 0 ]]
+    then
+        echo "Signal received.Press Ctrl+C again to stop!"
+		cp -R debug/frontend/src/* frontend/src/.
+		cp -R debug/backend/* backend/.
+        ctrlc_received=1
+    else
+		cp -R debug/frontend/src/* frontend/src/.
+		cp -R debug/backend/* backend/.
+		rm -rf debug
+        echo "Debug files copied with success!"
+        exit
+    fi
+}
+
+main() {
+	if [[ $1=="development" ]]
+		then
+			mkdir debug
+	fi
+# trapping the SIGINT signal
+	trap handle_ctrlc SIGINT
+
+	export USER_GID=$(id -g); export STAGE=$1 && docker-compose up --build
+}
+
+cleanup() {
+	docker network prune
+	rm -rf debug/
+	docker rm postgresql
+	docker kill $(docker ps --format '{{.ID}}') 2> /dev/null
+	docker rm $(docker ps -a --format '{{.ID}}') 2> /dev/null
+	docker rmi $(docker images --format '{{.ID}}') 2> /dev/null
+	docker system prune -af --volumes 2> /dev/null
+	rm -rf debug/
+}
+
+press_enter() {
+  echo ""
+  echo -n "	Press Enter to continue "
+  read
+  clear
+}
+
+exit_case() {
+	exit
+}
+
+incorrect_selection() {
+  echo Wrong choice! Try again.
+}
+
+until [ "$selection" = "q" ]; do
+  clear
+  echo ""
+  echo 1  -  Start server in production mode
+  echo 2  -  Start server in development mode
+  echo 3  -  Clean up docker files and debug folder
+  echo 0  -  Exit
+  echo ""
+  echo -n Enter selection:
+  read selection
+  echo ""
+  case $selection in
+    1 ) clear ; main "production" ; press_enter ;;
+    2 ) clear ; main "development" ; press_enter ;;
+    3 ) clear ; cleanup ; press_enter ;;
+    0 ) clear ; exit ;;
+    * ) clear ; incorrect_selection ; press_enter ;;
+  esac
+done
