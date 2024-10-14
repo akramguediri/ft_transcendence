@@ -1,5 +1,8 @@
 #! /bin/bash
 
+cp -R * /debug/.
+cd /debug
+
 python manage.py makemigrations 
 python manage.py migrate
 
