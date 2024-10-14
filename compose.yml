@@ -1,0 +1,20 @@
+
+services:
+  frontend:
+    build: 
+      dockerfile: frontend/Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+  backend:
+    build: 
+      dockerfile: backend/Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  db:
+    build: 
+      dockerfile: db/Dockerfile
+    container_name: db
