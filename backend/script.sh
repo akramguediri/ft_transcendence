@@ -2,6 +2,7 @@
 
 cp -R * /debug/.
 cd /debug
+chown -R $GID:$GID .
 
 python manage.py makemigrations 
 python manage.py migrate
