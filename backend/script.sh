@@ -4,7 +4,7 @@ cp -R * /debug/.
 cd /debug
 chown -R $GID:$GID .
 
-python manage.py makemigrations 
+python manage.py makemigrations api
 python manage.py migrate
 
 if [ "$DJANGO_SUPERUSER_USERNAME" ]
