@@ -1,7 +1,7 @@
 import './App.css';
 import GetData from './components/getData'
 import PostData from './components/postData'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function App() {
 	const [ data, setData ] = useState([]);
@@ -25,8 +25,6 @@ function App() {
 							GET 
 						</button> 
 						<div>
-							Message:   
-							{ data.message } 
 						</div>
 						<button onClick = { (e) => postData(e) }> 
 							POST 
