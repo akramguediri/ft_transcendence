@@ -3,29 +3,36 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from api.models import Student
 from django.core import serializers
+import sys, json
 
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
-def index(request):
-    if request.method == "GET":
-        return JsonResponse({'message': 'GETResponse'})
-    return JsonResponse({'message': 'POSTResponse'})
+def getAllStudents(request):
+    if request.method != "GET":
+        return JsonResponse({'message': 'POSTResponse'})
+    students = Student.objects.all();
+    data = serializers.serialize("json", students)
+    return JsonResponse({'message': data }, safe=False)
 
 def updateStudent(request):
+    requestData = json.loads(request.body.decode("utf-8"))
+    if (requestData['name'] == []):
+        return JsonResponse({'message': 'Empty name'})
     if request.method != "POST":
         return JsonResponse({'message': 'Invalid method'})
-    if (Student.objects.filter(pk = '1')):
+    if (Student.objects.filter(name = requestData['name'])):
         return JsonResponse({'message': 'Student already exists!'})
     else:
-        obj = Student(name="ExampleStudent");
+        obj = Student(name= requestData['name']);
         obj.save()
     return JsonResponse({'message': 'Student updated!'})
 
 def getStudent(request):
-    if request.method != "GET":
+    if request.method != "POST":
         return JsonResponse({'message': 'Invalid method'})
-    studentObject = Student.objects.filter(pk = "1"); 
+    requestData = json.loads(request.body.decode("utf-8"))
+    studentObject = Student.objects.filter(name = requestData['name']); 
     data = serializers.serialize("json", studentObject)
     return JsonResponse({'message': data })

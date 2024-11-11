@@ -1,18 +1,25 @@
 import './App.css';
-import GetData from './components/getData'
-import PostData from './components/postData'
+import GetStudent from './components/getData'
+import UpdateStudent from './components/postData'
+import GetAllStudents from './components/getAllStudents'
 import { useState } from 'react';
 
 function App() {
 	const [ data, setData ] = useState([]);
+	const [ message, setMessage ] = useState([]);
 
-	async function getData() {
-		const resp  = await GetData();
+	async function getAll() {
+		const resp  = await GetAllStudents();
 		setData(resp);
 	}
 
-	async function postData() {
-		const resp  = await PostData();
+	async function getData(e) {
+		const resp  = await GetStudent(e);
+		setData(resp);
+	}
+
+	async function postData(e) {
+		const resp  = await UpdateStudent(e);
 		setData(resp);
 	}
 
@@ -20,21 +27,40 @@ function App() {
 		<div className="App">
 			<header className="App-header">
 
+			<button onClick = { (e) => getAll() }> 
+				GET all Students
+			</button> 
 				<div>
-						<button onClick = { (e) => getData(e) }> 
-							GET 
-						</button> 
-						<div>
-						</div>
-						<button onClick = { (e) => postData(e) }> 
-							POST 
-						</button> 
-						<div>
-							Message:   
-							{ data.message } 
-						</div>
-				</div>
+					<input className="getForm"
+						onChange = { (e) => setMessage(e.target.value) }
+					/>
 
+					<button onClick = { (e) => getData(message) }> 
+						GET 
+					</button> 
+
+					<div>
+					</div>
+
+					<input className="postForm"
+						onChange = { (e) => setMessage(e.target.value) }
+					/>
+
+					<button onClick = { 
+						(e) => 
+						postData(message) 
+					}> 
+						POST 
+					</button> 
+
+					<div>
+						{Object.entries(data).map(([key, value]) => (
+							<div>
+								<ul>{value}</ul>
+							</div>
+						))}
+					</div>
+				</div>
 			</header>
 		</div>
 	);

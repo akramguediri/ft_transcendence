@@ -1,10 +1,13 @@
 import GetCSRFToken from './getCSRFToken';
 
-async function PostData() {
+async function UpdateStudent(arg) {
 
 	const response = await fetch('http://127.0.0.1:8000/api/updateStudent', {
 		method: 'POST',
 		credentials: 'include',
+		body: JSON.stringify({
+				name : arg,
+			}),
 		headers: {
 			'X-CSRFToken': await GetCSRFToken(),
 			'Content-Type': 'application/json'
@@ -15,4 +18,4 @@ async function PostData() {
 	return data;
 }
 
-export default PostData;
+export default UpdateStudent;
