@@ -1,6 +1,7 @@
 import './App.css';
 import GetStudent from './components/getData'
 import UpdateStudent from './components/postData'
+// import UpdateName from './components/updateData'
 import GetAllStudents from './components/getAllStudents'
 import { useState } from 'react';
 
@@ -23,8 +24,13 @@ function App() {
 		setData(resp);
 	}
 
-	return (
-		<div className="App">
+	// async function updateData(e) {
+	// 	const resp  = await UpdateName(e);
+	// 	setData(resp);
+	// }
+
+	return (	
+	<div className="App">
 			<header className="App-header">
 
 			<button onClick = { (e) => getAll() }> 
