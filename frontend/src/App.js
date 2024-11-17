@@ -1,14 +1,24 @@
 import './App.css';
 import GetStudent from './components/getData'
 import UpdateStudent from './components/postData'
-// import UpdateName from './components/updateData'
+import UpdateName from './components/updateData'
 import GetAllStudents from './components/getAllStudents'
 import { useState } from 'react';
 
 function App() {
 	const [ data, setData ] = useState([]);
 	const [ message, setMessage ] = useState([]);
+	const [currentName, setCurrentName] = useState('');
+	const [newName, setNewName] = useState('');
 
+	async function updateData() {
+		if (currentName && newName) {
+		  const resp = await UpdateName({ name: currentName, new_name: newName });
+		  setData(resp);
+		} else {
+		  alert('Please provide both current and new names');
+		}
+	  }
 	async function getAll() {
 		const resp  = await GetAllStudents();
 		setData(resp);
@@ -24,16 +34,11 @@ function App() {
 		setData(resp);
 	}
 
-	// async function updateData(e) {
-	// 	const resp  = await UpdateName(e);
-	// 	setData(resp);
-	// }
-
 	return (	
 	<div className="App">
 			<header className="App-header">
 
-			<button onClick = { (e) => getAll() }> 
+			<button onClick = { () => getAll() }> 
 				GET all Students
 			</button> 
 				<div>
@@ -41,7 +46,7 @@ function App() {
 						onChange = { (e) => setMessage(e.target.value) }
 					/>
 
-					<button onClick = { (e) => getData(message) }> 
+					<button onClick = { () => getData(message) }> 
 						GET 
 					</button> 
 
@@ -58,6 +63,24 @@ function App() {
 					}> 
 						POST 
 					</button> 
+
+					<div>
+					<input
+						className="getForm"
+						placeholder="Enter current name"
+						onChange={(e) => setCurrentName(e.target.value)}
+					/>
+
+					<input
+						className="getForm"
+						placeholder="Enter new name"
+						onChange={(e) => setNewName(e.target.value)}
+					/>
+
+					<button onClick={updateData}>  {}
+						Update Name
+					</button>
+					</div>
 
 					<div>
 						{Object.entries(data).map(([key, value]) => (
