@@ -37,11 +37,6 @@ def getStudent(request):
     data = serializers.serialize("json", studentObject)
     return JsonResponse({'message': data })
 
-#this endpoint updates an existing username by passing the current name and the new_name
-# {
-#     "name": "anas",
-#     "new_name": "ananas"
-# }
 def updateName(request):
     if request.method != "POST":
         return JsonResponse({'msg': 'Invalid method'},)
