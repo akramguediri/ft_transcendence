@@ -22,7 +22,8 @@ services:
     volumes:
       - ./debug/backend/:/debug
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - GID=$USER_GID
       - DJANGO_SUPERUSER_PASSWORD=$DJANGO_PASS
@@ -37,3 +38,7 @@ services:
       - POSTGRES_PASSWORD=$DB_PASS
       - POSTGRES_DB=$DB_NAME
       - PGDATA=$DB_DATA
+    healthcheck:
+      test: pg_isready -d app -U user -h db -p 5432
+      interval: 5s
+      retries: 3
