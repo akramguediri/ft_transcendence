@@ -1,69 +1,48 @@
 import React, { useState } from 'react';
-import GetCSRFToken from '../getCSRFToken';
 import { Link, useNavigate } from 'react-router-dom';
 
-const UserRegistry = () => {
+const LoginUser = () => {
     const [user_name, setUserName] = useState('');
-    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [user_nameExistsError, setUserNameExistsError] = useState(false);
-    const [termAccepted, setTermAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [termInvalid, setTermInvalid] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleTermsChange = () => {
-        setTermAccepted(!termAccepted);
-        if (termInvalid && termAccepted) {
-            setTermInvalid(false);
-        }
-    };
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        if (!termAccepted) {
-            setTermInvalid(true);
-            return;
-        }
-        setLoading(true);
+        setError(''); // Clear any previous errors
 
         if (!user_name || !password) {
-            alert('Please fill in all required fields');
-            setLoading(false);
+            setError('Please fill in all required fields.');
             return;
         }
 
+        setLoading(true);
         try {
-            const data = {
-                user_name,
-                pwd: password, // Match backend API field name
-                name: name || null,
-            };
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/register', {
-                method: 'POST',
+            const response = await fetch(`http://127.0.0.1:8000/usermanagement/login?user_name=${user_name}&password=${password}`, {
+                method: 'GET',
                 credentials: 'include',
-                body: JSON.stringify(data),
-                headers: {
-                    'X-CSRFToken': await GetCSRFToken(),
-                    'Content-Type': 'application/json',
-                },
-            });
-
+            });            
+            console.log('Response:', response);
             if (!response.ok) {
                 const errorData = await response.json();
-                setUserNameExistsError(errorData.err?.includes('user_name already exists'));
-                throw new Error(errorData.msg || 'Failed to create user');
+                setError(errorData.msg || 'Failed to login. Please try again.');
+                throw new Error(errorData.msg);
             }
 
-            alert('User created successfully!');
-            navigate('/home-page');
+            const data = await response.json();
+            alert('Login successful!');
+            console.log('User data:', data);
+
+            // Redirect to the home page or dashboard
+            navigate('/home-page'); // Uncomment if using react-router
         } catch (error) {
-            console.error('Error creating user:', error);
+            console.error('Error logging in:', error);
         } finally {
             setLoading(false);
         }
@@ -76,15 +55,8 @@ const UserRegistry = () => {
                     <input
                         type="text"
                         placeholder="Username"
+                        value={user_name}
                         onChange={(e) => setUserName(e.target.value)}
-                        className="form-control form-control-sm"
-                    />
-                </div>
-                <div className="mb-3">
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        onChange={(e) => setName(e.target.value)}
                         className="form-control form-control-sm"
                     />
                 </div>
@@ -92,6 +64,7 @@ const UserRegistry = () => {
                     <input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
+                        value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="form-control form-control-sm"
                     />
@@ -123,34 +96,19 @@ const UserRegistry = () => {
                     </span>
                 </div>
 
+                {error && <p className="text-danger small">{error}</p>}
+
                 <button
                     type="submit"
                     className="btn btn-primary btn-sm w-100 mb-3"
                     disabled={loading}
                 >
-                    {loading ? 'Creating Account...' : 'Create an Account'}
+                    {loading ? 'Logging in...' : 'Login'}
                 </button>
-
-                <div className="form-check mb-3">
-                    <input
-                        type="checkbox"
-                        onChange={handleTermsChange}
-                        checked={termAccepted}
-                        className="form-check-input"
-                        id="termsCheckbox"
-                    />
-                    <label className="form-check-label small" htmlFor="termsCheckbox">
-                        I agree to the <a href="#" className="text-primary">Terms & Conditions</a>.
-                    </label>
-                </div>
-                {termInvalid && <p className="text-danger small">Please accept the terms and conditions.</p>}
-                {user_nameExistsError && <p className="text-danger small">Username already exists. Please choose another one.</p>}
-
                 <div>
                     <p className="small mt-2 mx-1 text-black">
-                        Already have an account?{" "}
-                        {/* <Link to="/log" className="text-blue-600 underline">Log in</Link> */}
-                        <Link to="/login" className="text-blue-600 underline">Log in</Link>
+                        Don't have an account?{" "}
+                        <Link to="/" className="text-blue-600 underline">Log in</Link>
                     </p>
                 </div>
             </form>
@@ -158,4 +116,4 @@ const UserRegistry = () => {
     );
 };
 
-export default UserRegistry;
+export default LoginUser;
