@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import make_password, check_password
-from api.models import User  # Import the User model
+from usermanagement.models import User  # Import the User model
 from django.http import JsonResponse
 import json
 
