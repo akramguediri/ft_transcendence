@@ -32,15 +32,23 @@ const LoginUser = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 setError(errorData.msg || 'Failed to login. Please try again.');
-                throw new Error(errorData.msg);
+                // throw new Error(errorData.msg);
+                return;
             }
 
             const data = await response.json();
-            alert('Login successful!');
-            console.log('User data:', data);
-
-            // Redirect to the home page or dashboard
-            navigate('/home-page'); // Uncomment if using react-router
+            if(data.status === 'success'){
+                localStorage.setItem("user", JSON.stringify(data.user));
+                alert('Login successful!');
+                console.log('User data:', data);
+                // Redirect to the home page or dashboard
+                navigate('/home-page'); // Uncomment if using react-router
+                return data;
+            } else {
+                const errorData = await response.json();
+                setError(errorData.msg || 'Failed to login. Please try again.');
+                // throw new Error(errorData.msg);
+            }
         } catch (error) {
             console.error('Error logging in:', error);
         } finally {
