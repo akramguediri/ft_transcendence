@@ -3,6 +3,9 @@ from django.middleware.csrf import get_token
 from api.models import Student
 from django.core import serializers
 import sys, json
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
+from api.models import User  # Assuming `User` is the model name
 
 
 def csrf(request):
@@ -65,3 +68,65 @@ def getStudent(request):
     studentObject = Student.objects.filter(name = requestData['name']); 
     data = serializers.serialize("json", studentObject)
     return JsonResponse({'message': data })
+
+@csrf_exempt  # Allows the endpoint to be tested without CSRF validation
+def fetch_user_by_id(request):
+    """
+    Fetches user data by user ID.
+    """
+    if request.method != "POST":
+        return JsonResponse({
+            'msg': 'Invalid request method',
+            'status': 'error',
+            'err': ['Only POST requests are allowed']
+        }, status=405)
+
+    try:
+        # Parse the JSON request body
+        request_data = json.loads(request.body.decode('utf-8'))
+        user_id = request_data.get('user_id')
+
+        if not user_id:
+            return JsonResponse({
+                'msg': 'Missing user ID in request',
+                'status': 'error',
+                'err': ['user_id is required']
+            }, status=400)
+
+        # Fetch the user by ID
+        user = User.objects.get(id=user_id)
+
+        # Prepare the response data
+        user_data = {
+            'id': user.id,
+            'name': user.name,
+            'description': user.description,
+            'avatar': user.avatar
+        }
+
+        return JsonResponse({
+            'msg': 'User fetched successfully',
+            'status': 'success',
+            'data': {
+                'user': user_data
+            }
+        }, status=200)
+
+    except ObjectDoesNotExist:
+        return JsonResponse({
+            'msg': 'User not found',
+            'status': 'error',
+            'err': [f'No user found with id: {user_id}']
+        }, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'msg': 'Invalid JSON format',
+            'status': 'error',
+            'err': ['The request body must be a valid JSON']
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'msg': 'An unexpected error occurred',
+            'status': 'error',
+            'err': [str(e)]
+        }, status=500)
