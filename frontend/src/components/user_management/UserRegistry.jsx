@@ -61,7 +61,7 @@ const UserRegistry = () => {
             }
 
             alert('User created successfully!');
-            navigate('/home-page');
+            navigate('/login');
         } catch (error) {
             console.error('Error creating user:', error);
         } finally {
