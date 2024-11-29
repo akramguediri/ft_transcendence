@@ -1,19 +1,34 @@
 from django.contrib.auth.hashers import make_password, check_password
-from api.models import User  # Import the User model
+from django.middleware.csrf import get_token
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
 import json
+from .models import MyUser
+from django.contrib.auth import authenticate, login
+
+def csrf(request):
+    return JsonResponse({'csrfToken': get_token(request)})
+
+def getAllUsers(request):
+    if request.method != "GET":
+        return JsonResponse({'message': 'POSTResponse'})
+    users = MyUser.objects.all()
+    users_list = list(users.values())
+    return JsonResponse(users_list, safe=False) 
+
 
 def loginUser(request):
-    if request.method != "GET":
+    if request.method != "POST":  # Changed to POST for security
         return JsonResponse({
             'status': 'error',
-            'msg': 'Invalid request method. Only GET is allowed.',
+            'msg': 'Invalid request method. Only POST is allowed.',
         }, status=405)
 
     try:
-        # Extract query parameters
-        user_name = request.GET.get('user_name')
-        password = request.GET.get('password')
+        # Parse JSON request body
+        data = json.loads(request.body)
+        user_name = data.get('user_name')
+        password = data.get('password')
 
         # Validate required fields
         if not user_name or not password:
@@ -22,32 +37,35 @@ def loginUser(request):
                 'msg': 'Missing user_name or password in the request.'
             }, status=400)
 
-        # Check if user exists
-        try:
-            user = User.objects.get(user_name=user_name)
-        except User.DoesNotExist:
+        # Authenticate user
+        user = authenticate(request, username=user_name, password=password)
+        if user is None:
             return JsonResponse({
                 'status': 'error',
                 'msg': 'Invalid username or password.'
             }, status=401)
 
-        # Check if the password matches
-        if not check_password(password, user.password):
-            return JsonResponse({
-                'status': 'error',
-                'msg': 'Invalid username or password.'
-            }, status=401)
-
-        # If successful, return user data
+        # Log the user in
+        
+        login(request, user)
+        # token = 
+        # Return user data upon successful login
         return JsonResponse({
             'status': 'success',
             'msg': 'Login successful.',
             'user': {
                 'id': user.id,
                 'user_name': user.user_name,
-                'name': user.name
+                'name': user.name,
+                # 'token': token
             }
         }, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'msg': 'Invalid JSON format.',
+        }, status=400)
 
     except Exception as e:
         return JsonResponse({
@@ -79,29 +97,39 @@ def registerUser(request):
             }, status=400)
 
         # Check if user already exists
-        if User.objects.filter(user_name=user_name).exists():
+        if MyUser.objects.filter(user_name=user_name).exists():
             return JsonResponse({
                 'status': 'error',
                 'msg': 'User already exists',
             }, status=400)
 
-        # Create and save new user
-        new_user = User(
+        # Use the custom user manager to create the user (handles hashing automatically)
+        new_user = MyUser.objects.create_user(
             user_name=user_name,
-            name=name,
-            password=make_password(password),  # Hash the password for security
+            password=password,
+            name=name
         )
-        new_user.save()
 
         return JsonResponse({
             'status': 'success',
             'msg': 'User registered successfully',
+            'user': {
+                'id': new_user.id,
+                'user_name': new_user.user_name,
+                'name': new_user.name
+            }
         }, status=201)
 
     except json.JSONDecodeError:
         return JsonResponse({
             'status': 'error',
             'msg': 'Invalid JSON format',
+        }, status=400)
+    except ValidationError as ve:
+        return JsonResponse({
+            'status': 'error',
+            'msg': 'Validation error',
+            'err': list(ve.messages)
         }, status=400)
     except Exception as e:
         return JsonResponse({
