@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import GetCSRFToken from '../getCSRFToken';
 
 const LoginUser = () => {
     const [user_name, setUserName] = useState('');
@@ -24,17 +25,16 @@ const LoginUser = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/usermanagement/login?user_name=${user_name}&password=${password}`, {
-                method: 'GET',
+            const csrfToken = await GetCSRFToken(); // Fetch the CSRF token
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/login', {
+                method: 'POST',
                 credentials: 'include',
-            });            
-            console.log('Response:', response);
-            if (!response.ok) {
-                const errorData = await response.json();
-                setError(errorData.msg || 'Failed to login. Please try again.');
-                // throw new Error(errorData.msg);
-                return;
-            }
+                headers: {
+                    'X-CSRFToken': csrfToken, // Include CSRF token
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_name, password }),
+            });
 
             const data = await response.json();
             if(data.status === 'success'){
@@ -43,7 +43,6 @@ const LoginUser = () => {
                 console.log('User data:', data);
                 // Redirect to the home page or dashboard
                 navigate('/home-page'); // Uncomment if using react-router
-                return data;
             } else {
                 const errorData = await response.json();
                 setError(errorData.msg || 'Failed to login. Please try again.');
@@ -116,7 +115,7 @@ const LoginUser = () => {
                 <div>
                     <p className="small mt-2 mx-1 text-black">
                         Don't have an account?{" "}
-                        <Link to="/" className="text-blue-600 underline">Log in</Link>
+                        <Link to="/" className="text-blue-600 underline">Register</Link>
                     </p>
                 </div>
             </form>
