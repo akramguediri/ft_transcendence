@@ -137,3 +137,27 @@ def registerUser(request):
             'msg': 'An unexpected error occurred',
             'err': [str(e)]
         }, status=500)
+    
+
+def updateName(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'msg': 'User not authenticated'}, status=401)
+
+    try:
+        data = json.loads(request.body)
+        new_name = data.get('new_name')
+
+        if not new_name:
+            return JsonResponse({'status': 'error', 'msg': 'New name is required'}, status=400)
+
+        # Update the name of the authenticated user
+        request.user.name = new_name
+        request.user.save()
+
+        return JsonResponse({'status': 'success', 'msg': 'User name updated successfully!'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
