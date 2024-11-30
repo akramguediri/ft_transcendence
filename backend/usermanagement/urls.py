@@ -7,4 +7,5 @@ urlpatterns = [
     path("csrf", views.csrf, name="csrf"),
     path("register", views.registerUser, name="registerUser"),
     path("login", views.loginUser, name="loginUser"),
+    path("updateName", views.updateName, name="updateName"),
 ]
