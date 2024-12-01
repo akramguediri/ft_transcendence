@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password, check_password
 from django.middleware.csrf import get_token
+
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 import json
