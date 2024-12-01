@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from api.models import Student
@@ -65,3 +66,36 @@ def getStudent(request):
     studentObject = Student.objects.filter(name = requestData['name']); 
     data = serializers.serialize("json", studentObject)
     return JsonResponse({'message': data })
+
+
+
+@login_required
+def updateName(request):
+    if request.method != "POST":
+        return JsonResponse({'msg': 'Invalid method'}, status=405)
+
+    try:
+        # Parse the request body
+        requestData = json.loads(request.body.decode("utf-8"))
+        new_name = requestData.get('new_name')
+
+        # Validate the new name
+        if not new_name:
+            return JsonResponse({'message': 'New name is required'}, status=400)
+
+        # Update the name of the logged-in user
+        user = request.user
+        user.first_name = new_name  # Adjust if you use a custom user model
+        user.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'User name updated successfully!'
+        }, status=200)
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'msg': 'An error occurred.',
+            'err': [str(e)]
+        }, status=500)
