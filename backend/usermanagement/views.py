@@ -1,11 +1,9 @@
-from django.contrib.auth.hashers import make_password, check_password
 from django.middleware.csrf import get_token
-
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 import json
 from .models import MyUser
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
@@ -19,26 +17,23 @@ def getAllUsers(request):
 
 
 def loginUser(request):
-    if request.method != "POST":  # Changed to POST for security
+    if request.method != "POST":
         return JsonResponse({
             'status': 'error',
             'msg': 'Invalid request method. Only POST is allowed.',
         }, status=405)
 
     try:
-        # Parse JSON request body
         data = json.loads(request.body)
         user_name = data.get('user_name')
         password = data.get('password')
 
-        # Validate required fields
         if not user_name or not password:
             return JsonResponse({
                 'status': 'error',
                 'msg': 'Missing user_name or password in the request.'
             }, status=400)
 
-        # Authenticate user
         user = authenticate(request, username=user_name, password=password)
         if user is None:
             return JsonResponse({
@@ -46,11 +41,7 @@ def loginUser(request):
                 'msg': 'Invalid username or password.'
             }, status=401)
 
-        # Log the user in
-        
         login(request, user)
-        # token = 
-        # Return user data upon successful login
         return JsonResponse({
             'status': 'success',
             'msg': 'Login successful.',
@@ -58,7 +49,6 @@ def loginUser(request):
                 'id': user.id,
                 'user_name': user.user_name,
                 'name': user.name,
-                # 'token': token
             }
         }, status=200)
 
@@ -74,6 +64,16 @@ def loginUser(request):
             'msg': 'An unexpected error occurred.',
             'err': [str(e)]
         }, status=500)
+
+
+def logoutUser(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            logout(request)
+            return JsonResponse({'status': 'success', 'msg': 'Logged out successfully'})
+        else:
+            return JsonResponse({'status': 'error', 'msg': 'User is not authenticated'}, status=401)
+    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)
 
 def registerUser(request):
     if request.method != "POST":
