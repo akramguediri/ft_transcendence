@@ -31,6 +31,7 @@ const UserRegistry = () => {
             return;
         }
         setLoading(true);
+        setUserNameExistsError(false);
 
         if (!user_name || !password) {
             alert('Please fill in all required fields');
@@ -41,7 +42,7 @@ const UserRegistry = () => {
         try {
             const data = {
                 user_name,
-                pwd: password, // Match backend API field name
+                pwd: password,
                 name: name || null,
             };
             const response = await fetch('http://127.0.0.1:8000/usermanagement/register', {
@@ -54,12 +55,16 @@ const UserRegistry = () => {
                 },
             });
 
+            const responseData = await response.json();
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                setUserNameExistsError(errorData.err?.includes('user_name already exists'));
-                throw new Error(errorData.msg || 'Failed to create user');
+                if (responseData.msg === 'User already exists') {
+                    setUserNameExistsError(true); // Display error
+                } else {
+                    alert(responseData.msg || 'Failed to create user');
+                }
+                return; 
             }
-
             alert('User created successfully!');
             navigate('/login');
         } catch (error) {
@@ -149,7 +154,6 @@ const UserRegistry = () => {
                 <div>
                     <p className="small mt-2 mx-1 text-black">
                         Already have an account?{" "}
-                        {/* <Link to="/log" className="text-blue-600 underline">Log in</Link> */}
                         <Link to="/login" className="text-blue-600 underline">Log in</Link>
                     </p>
                 </div>
