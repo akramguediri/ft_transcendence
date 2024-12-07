@@ -16,8 +16,7 @@ const LoginUser = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Clear any previous errors
-
+        setError(''); 
         if (!user_name || !password) {
             setError('Please fill in all required fields.');
             return;
@@ -41,12 +40,10 @@ const LoginUser = () => {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 alert('Login successful!');
                 console.log('User data:', data);
-                // Redirect to the home page or dashboard
-                navigate('/home-page'); // Uncomment if using react-router
+                navigate('/home-page');
             } else {
                 const errorData = await response.json();
                 setError(errorData.msg || 'Failed to login. Please try again.');
-                // throw new Error(errorData.msg);
             }
         } catch (error) {
             console.error('Error logging in:', error);
