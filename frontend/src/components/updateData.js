@@ -17,7 +17,6 @@ async function UpdateName({name, new_name}) {
 
 
     if (data.status === 'success') {
-        // Update localStorage with the new name
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
             user.name = new_name;
