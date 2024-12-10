@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import UpdateName from './updateData';
 import logoutUser from './logoutUser';
 import { useNavigate } from 'react-router-dom';
+import UpdatePassword from './user_management/UpdatePassword';
 
 const HomePage = () => {
   const [userName, setUserName] = useState("");
@@ -72,6 +73,7 @@ const HomePage = () => {
       <div>
         <button onClick={handleLogout} className="btn btn-danger">Logout</button>
       </div>
+      <div> <UpdatePassword /></div>
     </div>
   )
 }
