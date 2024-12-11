@@ -9,4 +9,5 @@ urlpatterns = [
     path("login", views.loginUser, name="loginUser"),
     path("logout", views.logoutUser, name="logoutUser"),
     path("updateName", views.updateName, name="updateName"),
+    path("updatePassword", views.updatePassword, name="updatePassword"),
 ]
