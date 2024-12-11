@@ -11,6 +11,7 @@ async function logoutUser() {
     });
 
     const data = await response.json();
+    localStorage.removeItem('user');
     return data;
 }
 
