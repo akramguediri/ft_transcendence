@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { updatePassword } from '../updatePassword'; // Adjust the path as needed
+import { updatePassword } from '../updatePassword';
+import logoutUser from '../logoutUser';
+import { useNavigate } from 'react-router-dom';
 
 const UpdatePassword = () => {
     const [oldPassword, setOldPassword] = useState('');
@@ -8,6 +10,7 @@ const UpdatePassword = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,11 +21,12 @@ const UpdatePassword = () => {
         const result = await updatePassword(oldPassword, newPassword, newPasswordConfirm);
 
         if (result.success) {
-            setSuccessMessage(result.message);
+            setSuccessMessage('Password updated successfully. Logging out...');
+            localStorage.removeItem('user');
+            navigate('/login');
         } else {
-            setErrorMessage(result.message);
+            setErrorMessage(result.message || 'Failed to update password.');
         }
-
         setLoading(false);
     };
 
