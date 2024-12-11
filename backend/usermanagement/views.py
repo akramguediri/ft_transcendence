@@ -83,13 +83,11 @@ def registerUser(request):
         }, status=405)
 
     try:
-        # Parse request data
         requestData = json.loads(request.body.decode("utf-8"))
         user_name = requestData.get('user_name')
         password = requestData.get('pwd')
         name = requestData.get('name', '')
 
-        # Validate required fields
         if not user_name or not password:
             return JsonResponse({
                 'status': 'error',
@@ -97,14 +95,12 @@ def registerUser(request):
                 'err': ['user_name and pwd are required.']
             }, status=400)
 
-        # Check if user already exists
         if MyUser.objects.filter(user_name=user_name).exists():
             return JsonResponse({
                 'status': 'error',
                 'msg': 'User already exists',
             }, status=400)
 
-        # Use the custom user manager to create the user (handles hashing automatically)
         new_user = MyUser.objects.create_user(
             user_name=user_name,
             password=password,
@@ -186,70 +182,3 @@ def updatePassword(request):
         return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
 
     return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
-# def updatePassword(request):
-#     if request.method != "POST":
-#         return JsonResponse({
-#             'status': 'error',
-#             'msg': 'Invalid request method. Only POST is allowed.',
-#         }, status=405)
-
-#     try:
-#         # Parse request data
-#         data = json.loads(request.body.decode('utf-8'))
-#         old_pwd = data.get('old_pwd')
-#         new_pwd = data.get('new_pwd')
-#         new_pwd_confirm = data.get('new_pwd_confirm')
-
-#         # Validate required fields
-#         if not old_pwd or not new_pwd or not new_pwd_confirm:
-#             return JsonResponse({
-#                 'status': 'error',
-#                 'msg': 'Missing required fields',
-#                 'err': ['old_pwd, new_pwd, and new_pwd_confirm are required.']
-#             }, status=400)
-
-#         # Check if new passwords match
-#         if new_pwd != new_pwd_confirm:
-#             return JsonResponse({
-#                 'status': 'error',
-#                 'msg': 'New passwords do not match.',
-#                 'err': ['new_pwd and new_pwd_confirm must match.']
-#             }, status=400)
-
-#         # Verify the user is authenticated
-#         if not request.user.is_authenticated:
-#             return JsonResponse({
-#                 'status': 'error',
-#                 'msg': 'User not authenticated.',
-#                 'err': ['User must be logged in to update their password.']
-#             }, status=401)
-
-#         # Authenticate user with the old password
-#         user = authenticate(request, user_name=request.user.user_name, password=old_pwd)
-#         if user is None:
-#             return JsonResponse({
-#                 'status': 'error',
-#                 'msg': 'Incorrect old password.',
-#                 'err': ['Invalid old password.']
-#             }, status=400)
-
-#         # Update the user's password
-#         user.set_password(new_pwd)
-#         user.save()
-
-#         return JsonResponse({
-#             'status': 'success',
-#             'msg': 'Password updated successfully.',
-#         }, status=200)
-
-#     except json.JSONDecodeError:
-#         return JsonResponse({
-#             'status': 'error',
-#             'msg': 'Invalid JSON format.',
-#         }, status=400)
-#     except Exception as e:
-#         return JsonResponse({
-#             'status': 'error',
-#             'msg': 'An unexpected error occurred.',
-#             'err': [str(e)]
-#         }, status=500)
