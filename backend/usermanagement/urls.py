@@ -11,3 +11,4 @@ urlpatterns = [
     path('fetchUserById', views.fetchUserById, name='fetchUserById'),
     path("updatePassword", views.updatePassword, name="updatePassword"),
 ]
+
