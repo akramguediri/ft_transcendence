@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { updatePassword } from '../updatePassword';
-import logoutUser from '../logoutUser';
 import { useNavigate } from 'react-router-dom';
 
 const UpdatePassword = () => {
