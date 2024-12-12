@@ -191,3 +191,27 @@ def fetchUserById(request):
         return JsonResponse({"msg": "User fetched successfully", "status": "success", "data": {"user": user_data}})
     except json.JSONDecodeError:
         return JsonResponse({"msg": "Invalid JSON payload", "status": "error"}, status=400)
+
+def updatePassword(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        old_pwd = data.get("old_pwd")
+        new_pwd = data.get("new_pwd")
+        new_pwd_confirm = data.get("new_pwd_confirm")
+
+        if not request.user.is_authenticated:
+            return JsonResponse({'status': 'error', 'msg': 'User is not authenticated'}, status=401)
+
+        if new_pwd != new_pwd_confirm:
+            return JsonResponse({'status': 'error', 'msg': 'Passwords do not match'}, status=400)
+
+        user = request.user
+        if not user.check_password(old_pwd):
+            return JsonResponse({'status': 'error', 'msg': 'Old password is incorrect'}, status=400)
+
+        user.set_password(new_pwd)
+        user.save()
+        logout(request)
+        return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
+
+    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
