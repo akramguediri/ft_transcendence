@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
-def getAllUsers(request):
+def fetchUsers(request):
     if request.method != "GET":
         return JsonResponse({'message': 'POSTResponse'})
     users = MyUser.objects.all()
@@ -49,6 +49,8 @@ def loginUser(request):
                 'id': user.id,
                 'user_name': user.user_name,
                 'name': user.name,
+                'avatar': user.avatar,
+                'description': user.description,
             }
         }, status=200)
 

@@ -11,6 +11,8 @@ const HomePage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
