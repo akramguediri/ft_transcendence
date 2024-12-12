@@ -17,7 +17,7 @@ class MyUser(AbstractBaseUser):
     user_name = models.CharField(max_length=30, unique=True)  
     name = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True, null=True)
-    avatar = models.TextField(max_length=100, blank=True, null=True)   
+    avatar = models.TextField(blank=True, null=True, default='backend/Avatars/default-avatar.jpg')
 #user has to upload an avatar during registering or chose a default one
     objects = CustomUserManager()
 
