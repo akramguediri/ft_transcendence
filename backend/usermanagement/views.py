@@ -49,6 +49,8 @@ def loginUser(request):
                 'id': user.id,
                 'user_name': user.user_name,
                 'name': user.name,
+                'avatar': user.avatar,
+                'description': user.description,
             }
         }, status=200)
 
