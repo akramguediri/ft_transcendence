@@ -15,7 +15,10 @@ class CustomUserManager(BaseUserManager):
 
 class MyUser(AbstractBaseUser):
     user_name = models.CharField(max_length=30, unique=True)  
-    name = models.CharField(max_length=100, blank=True)      
+    name = models.CharField(max_length=100, blank=True)
+    description = models.TextField(blank=True, default="")
+    avatar = models.URLField(blank=True, default="")
+ 
 
     objects = CustomUserManager()
 

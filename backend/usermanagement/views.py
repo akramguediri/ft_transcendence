@@ -4,6 +4,9 @@ from django.core.exceptions import ValidationError
 import json
 from .models import MyUser
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from .models import MyUser
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
@@ -83,11 +86,13 @@ def registerUser(request):
         }, status=405)
 
     try:
+        # Parse request data
         requestData = json.loads(request.body.decode("utf-8"))
         user_name = requestData.get('user_name')
         password = requestData.get('pwd')
         name = requestData.get('name', '')
 
+        # Validate required fields
         if not user_name or not password:
             return JsonResponse({
                 'status': 'error',
@@ -95,12 +100,14 @@ def registerUser(request):
                 'err': ['user_name and pwd are required.']
             }, status=400)
 
+        # Check if user already exists
         if MyUser.objects.filter(user_name=user_name).exists():
             return JsonResponse({
                 'status': 'error',
                 'msg': 'User already exists',
             }, status=400)
 
+        # Use the custom user manager to create the user (handles hashing automatically)
         new_user = MyUser.objects.create_user(
             user_name=user_name,
             password=password,
@@ -158,27 +165,29 @@ def updateName(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-    
-def updatePassword(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        old_pwd = data.get("old_pwd")
-        new_pwd = data.get("new_pwd")
-        new_pwd_confirm = data.get("new_pwd_confirm")
 
-        if not request.user.is_authenticated:
-            return JsonResponse({'status': 'error', 'msg': 'User is not authenticated'}, status=401)
+@csrf_exempt  # Disable CSRF protection for testing (not recommended for production)
+def fetchUserById(request):
+    if request.method != "POST":
+        return JsonResponse({"msg": "Invalid request method", "status": "error"}, status=405)
 
-        if new_pwd != new_pwd_confirm:
-            return JsonResponse({'status': 'error', 'msg': 'Passwords do not match'}, status=400)
+    try:
+        body = json.loads(request.body)
+        user_id = body.get('user_id')
 
-        user = request.user
-        if not user.check_password(old_pwd):
-            return JsonResponse({'status': 'error', 'msg': 'Old password is incorrect'}, status=400)
+        if not user_id:
+            return JsonResponse({"msg": "User ID is required", "status": "error"}, status=400)
 
-        user.set_password(new_pwd)
-        user.save()
-        logout(request)
-        return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
+        user = MyUser.objects.filter(id=user_id).first()
+        if not user:
+            return JsonResponse({"msg": "User not found", "status": "error"}, status=404)
 
-    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "description": user.description,
+            "avatar": user.avatar
+        }
+        return JsonResponse({"msg": "User fetched successfully", "status": "success", "data": {"user": user_data}})
+    except json.JSONDecodeError:
+        return JsonResponse({"msg": "Invalid JSON payload", "status": "error"}, status=400)
