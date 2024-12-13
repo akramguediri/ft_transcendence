@@ -9,14 +9,14 @@ const HomePage = () => {
   const [userName, setUserName] = useState("");
   const [newName, setNewName] = useState('');
   const [message, setMessage] = useState('');
+  const [userAvatar, setUserAvatar] = useState('');
   const navigate = useNavigate();
-
-
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       setUserName(user.name);
+      setUserAvatar(`http://127.0.0.1:8000/media/${user.avatar}`);
     }
   }, []);
   const handleNameChange = async () => {
@@ -58,6 +58,16 @@ const HomePage = () => {
 
   return (
     <div><h1>HomePage </h1>
+      <img
+        src={userAvatar}
+        alt="User Avatar"
+        style={{
+          width: '100px',
+          height: '100px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+        }}
+      />
       <h1>Hello, {userName}!</h1>
       <div>
         <input
