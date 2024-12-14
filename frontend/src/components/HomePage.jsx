@@ -1,188 +1,40 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
-import UpdateName from './updateData';
-import logoutUser from './logoutUser';
-import { useNavigate } from 'react-router-dom';
+import { hero_42 } from '../assets';
+import Navbar from './Navbar';
 
-const HomePage = () => {
-  const [userName, setUserName] = useState('');
-  const [newName, setNewName] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [message, setMessage] = useState('');
-  const [userAvatar, setUserAvatar] = useState('');
-  const [fetchedUser, setFetchedUser] = useState(null);
-  const [userId, setUserId] = useState('');
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setUserName(user.name);
-      setUserAvatar(`http://127.0.0.1:8000/media/${user.avatar}`);
-    }
-  }, []);
-
-  const handleNameChange = async () => {
-    if (!newName.trim()) {
-      setMessage('Name cannot be empty.');
-      return;
-    }
-
-    const response = await UpdateName({ new_name: newName });
-    if (response.status === 'success') {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user) {
-        user.name = newName;
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-      setUserName(newName);
-      setMessage('Name updated successfully!');
-      setNewName('');
-    } else {
-      setMessage(response.msg || 'Failed to update name.');
-    }
-  };
-
-  const handleDescriptionChange = async () => {
-    if (!newDescription.trim()) {
-      setMessage('Description cannot be empty.');
-      return;
-    }
-  
-    try {
-      const response = await fetch('http://127.0.0.1:8000/usermanagement/updateDescription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ new_description: newDescription }),
-      });
-  
-      const data = await response.json();
-      if (data.status === 'success') {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-          user.description = newDescription;
-          localStorage.setItem('user', JSON.stringify(user));
-        }
-        setMessage('Description updated successfully!');
-        setNewDescription('');
-      } else {
-        setMessage(data.msg || 'Failed to update description.');
-      }
-    } catch (error) {
-      console.error('Error updating description:', error);
-      setMessage('An error occurred while updating the description.');
-    }
-  };  
-
-  const handleLogout = async () => {
-    try {
-      const response = await logoutUser();
-      if (response.status === 'success') {
-        localStorage.removeItem('user');
-        alert(response.msg);
-        navigate('/login');
-      } else {
-        alert(response.msg || 'Failed to log out');
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
-  const handleFetchUserById = async () => {
-    if (!userId.trim()) {
-      alert('User ID cannot be empty.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchUserById', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user_id: userId }),
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        setFetchedUser(data.data.user);
-        alert('User fetched successfully!');
-      } else {
-        alert(data.msg || 'Failed to fetch user.');
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      alert('Error fetching user.');
-    }
-  };
-
-  return (
-    <div><h1>HomePage </h1>
-      <img
-        src={userAvatar}
-        alt="User Avatar"
-        style={{
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          objectFit: 'cover',
-        }}
-      />
-      <h1>Hello, {userName}!</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Enter new name"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          className="form-control mb-2"
-        />
-        <button onClick={handleNameChange} className="btn btn-primary">
-          Update Name
-        </button>
-        {message && <p className="mt-2">{message}</p>}
-      </div>
-      <div className="mt-4">
-        <input
-          type="text"
-          placeholder="Enter new description"
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-          className="form-control mb-2"
-        />
-        <button onClick={handleDescriptionChange} className="btn btn-secondary">
-          Update Description
-        </button>
-      </div>
-      <div>
-        <button onClick={handleLogout} className="btn btn-danger">Logout</button>
-      </div>
-      <div className="mt-4">
-        <h2>Fetch User By ID</h2>
-        <input
-          type="text"
-          placeholder="Enter user ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          className="form-control mb-2"
-        />
-        <button onClick={handleFetchUserById} className="btn btn-info">
-          Fetch User
-        </button>
-        {fetchedUser && (
-          <div className="mt-3">
-            <h3>User Details:</h3>
-            <p><strong>ID:</strong> {fetchedUser.id}</p>
-            <p><strong>Name:</strong> {fetchedUser.name}</p>
-            <p><strong>Description:</strong> {fetchedUser.description}</p>
-            <p><strong>Avatar:</strong> {fetchedUser.avatar}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+const HomePage = () => (
+    <>
+        <header className="py-4">
+            <Navbar />
+        </header>
+        <section
+            id="toff"
+            style={{
+                background: `url(${hero_42}) no-repeat center center/cover fixed`,
+                height: '100vh',
+            }}
+        >
+            <div
+                className="background-overlay"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                }}
+            >
+                <div className="container text-center text-white">
+                    <h1>Welcome to our project ft_transcendence</h1>
+                    <p>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptates consectetur ex tenetur ullam
+                        laudantium nihil vel in, recusandae aliquid, dolor maxime repellendus quam, obcaecati fuga
+                        exercitationem iure officia fugit. Obcaecati.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </>
+);
 
 export default HomePage;
