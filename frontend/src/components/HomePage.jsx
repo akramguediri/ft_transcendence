@@ -7,12 +7,11 @@ import { useNavigate } from 'react-router-dom';
 const HomePage = () => {
   const [userName, setUserName] = useState('');
   const [newName, setNewName] = useState('');
+  const [newDescription, setNewDescription] = useState('');
   const [message, setMessage] = useState('');
-  const [fetchedUser, setFetchedUser] = useState(null); // State to store fetched user data
-  const [userId, setUserId] = useState(''); // State for user ID input
+  const [fetchedUser, setFetchedUser] = useState(null);
+  const [userId, setUserId] = useState('');
   const navigate = useNavigate();
-
-
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -41,6 +40,39 @@ const HomePage = () => {
       setMessage(response.msg || 'Failed to update name.');
     }
   };
+
+  const handleDescriptionChange = async () => {
+    if (!newDescription.trim()) {
+      setMessage('Description cannot be empty.');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://127.0.0.1:8000/usermanagement/updateDescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ new_description: newDescription }),
+      });
+  
+      const data = await response.json();
+      if (data.status === 'success') {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+          user.description = newDescription;
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+        setMessage('Description updated successfully!');
+        setNewDescription('');
+      } else {
+        setMessage(data.msg || 'Failed to update description.');
+      }
+    } catch (error) {
+      console.error('Error updating description:', error);
+      setMessage('An error occurred while updating the description.');
+    }
+  };  
 
   const handleLogout = async () => {
     try {
@@ -100,6 +132,18 @@ const HomePage = () => {
           Update Name
         </button>
         {message && <p className="mt-2">{message}</p>}
+      </div>
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Enter new description"
+          value={newDescription}
+          onChange={(e) => setNewDescription(e.target.value)}
+          className="form-control mb-2"
+        />
+        <button onClick={handleDescriptionChange} className="btn btn-secondary">
+          Update Description
+        </button>
       </div>
       <div>
         <button onClick={handleLogout} className="btn btn-danger">Logout</button>
