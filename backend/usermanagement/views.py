@@ -218,10 +218,13 @@ def updatePassword(request):
 
     return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
 
-@csrf_exempt
 def updateDescription(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'msg': 'User not authenticated'}, status=401)
+
     try:
         data = json.loads(request.body)
         new_description = data.get('new_description')
