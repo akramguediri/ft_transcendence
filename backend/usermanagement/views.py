@@ -217,3 +217,26 @@ def updatePassword(request):
         return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
 
     return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
+
+def updateDescription(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'msg': 'User not authenticated'}, status=401)
+
+    try:
+        data = json.loads(request.body)
+        new_description = data.get('new_description')
+
+        if not new_description:
+            return JsonResponse({'status': 'error', 'msg': 'New description is required'}, status=400)
+
+        # Update the description of the authenticated user
+        request.user.description = new_description
+        request.user.save()
+
+        return JsonResponse({'status': 'success', 'msg': 'User description updated successfully!'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
