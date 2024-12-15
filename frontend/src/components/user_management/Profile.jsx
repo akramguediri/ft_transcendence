@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UpdateName from '../updateData';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
     const [userName, setUserName] = useState('');
@@ -8,6 +9,7 @@ const Profile = () => {
     const [message, setMessage] = useState({ text: '', type: '' }); // To handle success or error states
     const [userId, setUserId] = useState('');
     const [fetchedUser, setFetchedUser] = useState(null);
+    const [newPassword, setNewPassword] = useState(''); // Add state for new password
 
     const handleNameChange = async () => {
         if (!newName.trim()) {
@@ -62,6 +64,14 @@ const Profile = () => {
         }
     };
 
+
+    const handlePasswordChange = async () => {
+        if (!newPassword.trim()) {
+            setMessage({ text: 'Password cannot be empty.', type: 'error' });
+            return;
+        }
+    };
+
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
@@ -71,52 +81,90 @@ const Profile = () => {
     }, []);
 
     return (
-        <div className="container mt-5 text-center">
-            {/* User Avatar */}
-            <img
-                src={userAvatar}
-                alt="User Avatar"
-                style={{
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    marginBottom: '15px',
-                }}
-                onError={(e) => (e.target.src = '/default-avatar.png')} // Fallback if image fails to load
-            />
-            <h1>Hello, {userName}!</h1>
-
-            {/* Update Name Form */}
-            <div className="mt-4">
-                <input
-                    type="text"
-                    placeholder="Enter new name"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="form-control mb-2"
-                    style={{ maxWidth: '300px', margin: '0 auto' }}
-                />
-                <button
-                    onClick={handleNameChange}
-                    className="btn btn-primary"
-                    disabled={!newName.trim()} // Disable button if input is empty
-                >
-                    Update Name
-                </button>
-            </div>
-
+        <div className="container mt-5">
+        <div className="border shadow-lg rounded p-4">
+            {/* Avatar and Greeting Section */}
+            <section className="mb-4">
+                <div className="d-flex align-items-center">
+                    <img
+                        src={userAvatar}
+                        alt="User Avatar"
+                        style={{
+                            width: '120px',
+                            height: '120px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                        }}
+                        onError={(e) => (e.target.src = '/default-avatar.png')} // Fallback if image fails to load
+                    />
+                    <h1 className="ms-4">Hello, {userName}!</h1>
+                </div>
+                <div className='d-flex gap-4'>
+                    <div className="mt-3">
+                        <button className="btn btn-danger">Change Avatar</button>
+                    </div>
+                    <div className="mt-3">
+                        <Link to='/home-page' className="btn btn-success text-light">return back to the Home page</Link>
+                    </div>
+                </div>
+            </section>
+    
+            {/* Update Name Section */}
+            <section className="mb-4">
+                <h4 className="mb-3">Update Your Name</h4>
+                <div className="d-flex gap-3">
+                    <input
+                        type="text"
+                        placeholder="Enter a new name"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        className="form-control"
+                        style={{ maxWidth: '300px' }}
+                    />
+                    <button
+                        onClick={handleNameChange}
+                        className="btn btn-primary px-4"
+                        disabled={!newName.trim()} // Disable button if input is empty
+                    >
+                        Save
+                    </button>
+                </div>
+            </section>
+    
+            {/* Change Password Section */}
+            <section className="mb-4">
+                <h4 className="mb-3">Change Your Password</h4>
+                <div className="d-flex gap-3">
+                    <input
+                        type="password"
+                        placeholder="Enter a new password"
+                        value={newPassword} // Change `newName` to `newPassword` for clarity
+                        onChange={(e) => setNewPassword(e.target.value)} // Add appropriate handler
+                        className="form-control"
+                        style={{ maxWidth: '300px' }}
+                    />
+                    <button
+                        onClick={handlePasswordChange} // Add appropriate handler
+                        className="btn btn-primary px-4"
+                        disabled={!newPassword.trim()} // Disable button if input is empty
+                    >
+                        Save
+                    </button>
+                </div>
+            </section>
+    
             {/* Feedback Message */}
             {message.text && (
-                <p
-                    className={`mt-3 ${message.type === 'success' ? 'text-success' : 'text-danger'}`}
-                    style={{ fontWeight: 'bold' }}
+                <div
+                    className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-danger'} mt-4`}
+                    role="alert"
                 >
                     {message.text}
-                </p>
+                </div>
             )}
+        </div>    
 
-            <section>
+            {/* <section>
                 <div className="mt-4">
                     <h2>Fetch User By ID</h2>
                     <input
@@ -152,7 +200,7 @@ const Profile = () => {
                     )}
 
                 </div>
-            </section>
+            </section> */}
         </div>
     );
 };
