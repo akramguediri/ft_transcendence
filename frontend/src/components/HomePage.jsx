@@ -1,41 +1,40 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
-import UpdateNameComponent from './user_management/UpdateName';
-import FetchUserById from './user_management/FetchUserById';
-import UpdatePassword from './user_management/UpdatePassword';
-import LogoutUser from './user_management/LogoutUser';
+import { hero_42 } from '../assets';
+import Navbar from './Navbar';
 
-const HomePage = () => {
-  const [userName, setUserName] = useState('');
-  const [userAvatar, setUserAvatar] = useState('');
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setUserName(user.name);
-      setUserAvatar(`http://127.0.0.1:8000/media/${user.avatar}`);
-    }
-  }, []);
-
-  return (
-    <div><h1>HomePage </h1>
-      <img
-        src={userAvatar}
-        alt="User Avatar"
-        style={{
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          objectFit: 'cover',
-        }}
-      />
-      <h1>Hello, {userName}!</h1>
-      <div> <UpdateNameComponent setUserName={setUserName} /> </div>
-      <div> <LogoutUser /> </div>
-      <div> <FetchUserById /> </div>
-      <div> <UpdatePassword /> </div>
-    </div>
-  );
-};
+const HomePage = () => (
+    <>
+        <header className="py-4">
+            <Navbar />
+        </header>
+        <section
+            id="toff"
+            style={{
+                background: `url(${hero_42}) no-repeat center center/cover fixed`,
+                height: '100vh',
+            }}
+        >
+            <div
+                className="background-overlay"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                }}
+            >
+                <div className="container text-center text-white">
+                    <h1>Welcome to our project ft_transcendence</h1>
+                    <p>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptates consectetur ex tenetur ullam
+                        laudantium nihil vel in, recusandae aliquid, dolor maxime repellendus quam, obcaecati fuga
+                        exercitationem iure officia fugit. Obcaecati.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </>
+);
 
 export default HomePage;
