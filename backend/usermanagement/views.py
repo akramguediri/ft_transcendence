@@ -1,4 +1,5 @@
 from django.middleware.csrf import get_token
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 import json
@@ -6,7 +7,7 @@ from .models import MyUser
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import MyUser
+from .models import MyUser, Friend
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
@@ -219,3 +220,55 @@ def updatePassword(request):
         return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
 
     return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
+
+def updateDescription(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'msg': 'User not authenticated'}, status=401)
+
+    try:
+        data = json.loads(request.body)
+        new_description = data.get('new_description')
+
+        if not new_description:
+            return JsonResponse({'status': 'error', 'msg': 'New description is required'}, status=400)
+
+        # Update the description of the authenticated user
+        request.user.description = new_description
+        request.user.save()
+
+        return JsonResponse({'status': 'success', 'msg': 'User description updated successfully!'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@csrf_exempt
+@login_required
+def fetch_user_friends(request):
+    if request.method != "GET":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        friends = Friend.objects.filter(user=user, is_blocked=False)
+        friend_list = [
+            {
+                'id': friend.friend.id,
+                'name': friend.friend.name,
+                'description': friend.friend.description,
+                'avatar': friend.friend.avatar,
+            }
+            for friend in friends
+        ]
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'friends': friend_list
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
