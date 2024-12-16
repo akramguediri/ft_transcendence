@@ -439,3 +439,39 @@ def block_user(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@login_required
+@csrf_protect
+def unblock_user(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+
+        target_user = MyUser.objects.filter(id=user_id).first()
+        if not target_user:
+            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
+
+        friendship = Friend.objects.filter(user=user, friend=target_user, is_blocked=True).first()
+        if not friendship:
+            return JsonResponse({'status': 'error', 'msg': 'User is not in your blocklist'}, status=400)
+
+        friendship.is_blocked = False
+        friendship.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': 'User unblocked successfully',
+            'data': {
+                'user_id': user_id
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
