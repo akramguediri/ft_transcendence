@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 import json
 from .models import MyUser
 from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
 
@@ -242,7 +242,7 @@ def updateDescription(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_exempt
+@csrf_protect
 @login_required
 def fetch_user_friends(request):
     if request.method != "GET":
@@ -265,6 +265,34 @@ def fetch_user_friends(request):
             'status': 'success',
             'data': {
                 'friends': friend_list
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@login_required
+@csrf_protect
+def is_blocked(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)  # Parse request body
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+
+        # Check if the user_id is in the current user's blocklist
+        is_blocked = Friend.objects.filter(user=user, friend_id=user_id, is_blocked=True).exists()
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'user_id': user_id,
+                'is_blocked': is_blocked
             }
         })
 
