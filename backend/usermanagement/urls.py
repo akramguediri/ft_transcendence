@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path("fetchUserById", views.fetchUserById, name="fetchUserById"),
-    path("fetchUses", views.fetchUses, name="fetchUses"),
+    path("fetchUsers", views.fetchUsers, name="fetchUsers"),
     path("csrf", views.csrf, name="csrf"),
     path("register", views.registerUser, name="registerUser"),
     path("login", views.loginUser, name="loginUser"),
