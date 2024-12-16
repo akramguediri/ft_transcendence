@@ -397,3 +397,45 @@ def remove_friend(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+    
+@login_required
+@csrf_protect
+def block_user(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)  # Parse request body
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+
+        # Ensure the user exists
+        target_user = MyUser.objects.filter(id=user_id).first()
+        if not target_user:
+            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
+
+        # Check if the user is already blocked
+        friendship = Friend.objects.filter(user=user, friend=target_user).first()
+        if friendship and friendship.is_blocked:
+            return JsonResponse({'status': 'error', 'msg': 'User is already blocked'}, status=400)
+
+        # Block the user
+        if friendship:
+            friendship.is_blocked = True
+            friendship.save()
+        else:
+            Friend.objects.create(user=user, friend=target_user, is_blocked=True)
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': 'User blocked successfully',
+            'data': {
+                'user_id': user_id
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
