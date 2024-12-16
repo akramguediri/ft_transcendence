@@ -169,10 +169,13 @@ def updateName(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_exempt  # Disable CSRF protection for testing (not recommended for production)
+# @csrf_exempt
 def fetchUserById(request):
     if request.method != "POST":
         return JsonResponse({"msg": "Invalid request method", "status": "error"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"msg": "User not authenticated", "status": "error"}, status=401)
 
     try:
         body = json.loads(request.body)
