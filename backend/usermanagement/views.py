@@ -378,4 +378,34 @@ def is_blocked(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+@login_required
+@csrf_protect
+def remove_friend(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+
+        friendship = Friend.objects.filter(user=user, friend_id=user_id).first()
+        if not friendship:
+            return JsonResponse({'status': 'error', 'msg': 'Friendship not found'}, status=404)
+
+        friendship.delete()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': 'Friend removed successfully',
+            'data': {
+                'user_id': user_id
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
