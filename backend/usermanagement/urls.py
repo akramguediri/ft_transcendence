@@ -17,4 +17,5 @@ urlpatterns = [
     path('removefriend', views.remove_friend, name='remove_friend'),
     path('blockuser', views.block_user, name='block_user'),
     path('unblockuser', views.unblock_user, name='unblock_user'),
+    path('fetchblockedusers', views.fetch_blocked_users, name='fetch_blocked_users'),
 ]

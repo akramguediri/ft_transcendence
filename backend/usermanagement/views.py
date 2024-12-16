@@ -475,3 +475,33 @@ def unblock_user(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@login_required
+@csrf_protect
+def fetch_blocked_users(request):
+    if request.method != "GET":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+
+        blocked_users = Friend.objects.filter(user=user, is_blocked=True)
+        blocked_users_list = [
+            {
+                'id': blocked.friend.id,
+                'name': blocked.friend.name,
+                'description': blocked.friend.description,
+                'avatar': blocked.friend.avatar,
+            }
+            for blocked in blocked_users
+        ]
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'blocked_users': blocked_users_list
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
