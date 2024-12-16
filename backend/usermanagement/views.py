@@ -324,6 +324,7 @@ def is_blocked(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
+
 @csrf_protect
 @login_required
 def fetch_user_friends(request):
