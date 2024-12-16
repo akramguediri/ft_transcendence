@@ -11,6 +11,7 @@ urlpatterns = [
     path('fetchUserById', views.fetchUserById, name='fetchUserById'),
     path("updatePassword", views.updatePassword, name="updatePassword"),
     path("updateDescription", views.updateDescription, name="updateDescription"),
+    path('updateAvatar', views.update_avatar, name='update_avatar'),
     path('fetchuserfriends', views.fetch_user_friends, name='fetch_user_friends'),
     path('isblocked', views.is_blocked, name='is_blocked'),
     path('addfriend', views.add_friend, name='add_friend'),

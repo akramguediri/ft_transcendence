@@ -242,6 +242,31 @@ def updateDescription(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
+@login_required
+@csrf_protect
+def update_avatar(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)
+        new_avatar_url = data.get('new_avatar_url')
+
+        if not new_avatar_url:
+            return JsonResponse({'status': 'error', 'msg': 'New avatar URL is required'}, status=400)
+
+        user.avatar = new_avatar_url
+        user.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': 'Avatar updated successfully',
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
 @csrf_protect
 @login_required
 def fetch_user_friends(request):
@@ -299,7 +324,7 @@ def is_blocked(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_exempt
+@csrf_protect
 @login_required
 def fetch_user_friends(request):
     if request.method != "GET":
