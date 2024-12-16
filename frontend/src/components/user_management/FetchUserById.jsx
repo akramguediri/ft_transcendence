@@ -47,10 +47,21 @@ const FetchUserById = () => {
                 <div className="card mt-3" style={{ maxWidth: '400px', margin: 'auto' }}>
                     <div className="card-body text-center">
                         <h3>User Details:</h3>
+                        <img
+                            src={`http://127.0.0.1:8000/media/${fetchedUser.avatar}`}
+                            alt="User Avatar"
+                            style={{
+                                width: '100px',
+                                height: '100px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                marginBottom: '15px',
+                            }}
+                            onError={(e) => (e.target.src = '/default-avatar.png')}
+                        />
                         <p><strong>ID:</strong> {fetchedUser.id}</p>
                         <p><strong>Name:</strong> {fetchedUser.name}</p>
                         <p><strong>Description:</strong> {fetchedUser.description}</p>
-                        <p>{fetchedUser.avatar}</p>
                     </div>
                 </div>
             )}
