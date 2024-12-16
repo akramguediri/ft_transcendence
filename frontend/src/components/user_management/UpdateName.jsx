@@ -28,17 +28,33 @@ const UpdateNameComponent = ({ setUserName }) => {
 
     return (
         <div>
-            <input
-                type="text"
-                placeholder="Enter new name"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="form-control mb-2"
-            />
-            <button onClick={handleNameChange} className="btn btn-primary">
-                Update Name
-            </button>
-            {message && <p className="mt-2">{message}</p>}
+
+            <div className="mt-4">
+                <input
+                    type="text"
+                    placeholder="Enter new name"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="form-control mb-2"
+                    style={{ maxWidth: '300px', margin: '0 auto' }}
+                />
+                <button
+                    onClick={handleNameChange}
+                    className="btn btn-primary"
+                    disabled={!newName.trim()}
+                >
+                    Update Name
+                </button>
+            </div>
+            {/* Feedback Message */}
+            {message.text && (
+                <p
+                    className={`mt-3 ${message.type === 'success' ? 'text-success' : 'text-danger'}`}
+                    style={{ fontWeight: 'bold' }}
+                >
+                    {message.text}
+                </p>
+            )}
         </div>
     );
 };

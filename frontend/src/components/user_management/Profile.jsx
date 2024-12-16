@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import UpdateNameComponent from './UpdateName';
 import FetchUserById from './FetchUserById';
 import UpdatePassword from './UpdatePassword';
-import LogoutUser from './LogoutUser';
 
 const Profile = () => {
     const [userName, setUserName] = useState('');
@@ -17,20 +16,22 @@ const Profile = () => {
     }, []);
 
     return (
-        <div><h1>HomePage </h1>
+        <div className="container mt-5 text-center">
+            <h1>HomePage </h1>
             <img
                 src={userAvatar}
                 alt="User Avatar"
                 style={{
-                    width: '100px',
-                    height: '100px',
+                    width: '120px',
+                    height: '120px',
                     borderRadius: '50%',
                     objectFit: 'cover',
+                    marginBottom: '15px',
                 }}
+                onError={(e) => (e.target.src = '/default-avatar.png')} // Fallback if image fails to load
             />
             <h1>Hello, {userName}!</h1>
             <div> <UpdateNameComponent setUserName={setUserName} /> </div>
-            {/* <div> <LogoutUser /> </div> */}
             <div> <FetchUserById /> </div>
             <div> <UpdatePassword /> </div>
         </div>

@@ -1,35 +1,32 @@
 import React, { useState } from 'react';
-import GetCSRFToken from '../getCSRFToken';
+import fetchUsersById from '../fetchUsersById';
 
 const FetchUserById = () => {
     const [fetchedUser, setFetchedUser] = useState(null);
     const [userId, setUserId] = useState('');
+    const [error, setError] = useState('');
 
     const handleFetchUserById = async () => {
         if (!userId.trim()) {
-            alert('User ID cannot be empty.');
+            setError('User ID cannot be empty.');
             return;
         }
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchUserById', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': await GetCSRFToken(),
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: userId }),
-            });
-            const data = await response.json();
+            const response = await fetchUsersById(userId);
+            if (response.status !== 'success') {
+                setError(response.msg || 'Error fetching user.');
+                return;
+            }
+            const data = response.data;
             if (data.status === 'success') {
                 setFetchedUser(data.data.user);
-                alert('User fetched successfully!');
             } else {
-                alert(data.msg || 'Failed to fetch user.');
+                setError(data.msg || 'Error fetching user.');
             }
         } catch (error) {
-            console.error('Error fetching user:', error);
-            alert('Error fetching user.');
+            setError('Error fetching user.');
         }
+
     };
 
     return (
@@ -45,13 +42,16 @@ const FetchUserById = () => {
             <button onClick={handleFetchUserById} className="btn btn-info">
                 Fetch User
             </button>
+            {error && <p className="text-danger small">{error}</p>}
             {fetchedUser && (
-                <div className="mt-3">
-                    <h3>User Details:</h3>
-                    <p><strong>ID:</strong> {fetchedUser.id}</p>
-                    <p><strong>Name:</strong> {fetchedUser.name}</p>
-                    <p><strong>Description:</strong> {fetchedUser.description}</p>
-                    <p><strong>Avatar:</strong> {fetchedUser.avatar}</p>
+                <div className="card mt-3" style={{ maxWidth: '400px', margin: 'auto' }}>
+                    <div className="card-body text-center">
+                        <h3>User Details:</h3>
+                        <p><strong>ID:</strong> {fetchedUser.id}</p>
+                        <p><strong>Name:</strong> {fetchedUser.name}</p>
+                        <p><strong>Description:</strong> {fetchedUser.description}</p>
+                        <p>{fetchedUser.avatar}</p>
+                    </div>
                 </div>
             )}
         </div>

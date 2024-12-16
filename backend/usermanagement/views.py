@@ -169,6 +169,7 @@ def updateName(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
+# @csrf_exempt
 def fetchUserById(request):
     if request.method != "POST":
         return JsonResponse({"msg": "Invalid request method", "status": "error"}, status=405)

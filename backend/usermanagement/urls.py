@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("fetchUsers", views.fetchUsers, name="fetchUsers"),
+    path("fetchUserById", views.fetchUserById, name="fetchUserById"),
+    path("fetchUses", views.fetchUses, name="fetchUses"),
     path("csrf", views.csrf, name="csrf"),
     path("register", views.registerUser, name="registerUser"),
     path("login", views.loginUser, name="loginUser"),
