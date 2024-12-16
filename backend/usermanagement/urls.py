@@ -12,5 +12,5 @@ urlpatterns = [
     path("updatePassword", views.updatePassword, name="updatePassword"),
     path("updateDescription", views.updateDescription, name="updateDescription"),
     path('fetchuserfriends', views.fetch_user_friends, name='fetch_user_friends'),
+    path('isblocked', views.is_blocked, name='is_blocked'),
 ]
-
