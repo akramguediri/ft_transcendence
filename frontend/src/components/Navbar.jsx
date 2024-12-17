@@ -1,25 +1,25 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
-import LogoutUser from './user_management/LogoutUser';
+import { Link, useNavigate } from 'react-router-dom';
+import logoutUser from './logoutUser';
 
 const Navbar = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
-    // const handleLogout = async () => {
-    //     try {
-    //         const response = await logoutUser();
-    //         if (response.status === 'success') {
-    //             localStorage.removeItem('user');
-    //             alert(response.msg);
-    //             navigate('/login');
-    //         } else {
-    //             alert(response.msg || 'Failed to log out');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error logging out:', error);
-    //         alert('An unexpected error occurred during logout.');
-    //     }
-    // };
+    const handleLogout = async () => {
+        try {
+            const response = await logoutUser();
+            if (response.status === 'success') {
+                localStorage.removeItem('user');
+                alert(response.msg);
+                navigate('/login');
+            } else {
+                alert(response.msg || 'Failed to log out');
+            }
+        } catch (error) {
+            console.error('Error logging out:', error);
+            alert('An unexpected error occurred during logout.');
+        }
+    };
 
     return (
         <nav className="navbar navbar-expand-md bg-light navbar-light fixed-top">
@@ -52,11 +52,8 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link className="nav-link" to="/invitation">Invitation</Link>
                         </li>
-                        {/* <li className="nav-item">
-                            <button onClick={handleLogout} className="btn">Logout</button>
-                        </li> */}
                         <li className="nav-item">
-                            <LogoutUser />
+                            <button onClick={handleLogout} className="btn">Logout</button>
                         </li>
                     </ul>
                 </div>
