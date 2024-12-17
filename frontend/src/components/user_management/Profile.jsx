@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import UpdateName from '../updateData';
 import { Link } from 'react-router-dom';
 import styles from '../../styles.css'
+import UpdateNameComponent from './UpdateName';
+import FetchUserById from './FetchUserById';
+import UpdatePassword from './UpdatePassword';
 
 const Profile = () => {
     const [userName, setUserName] = useState('');
@@ -157,44 +160,9 @@ const Profile = () => {
                 </div>
             )}
         </div>    
-
-            {/* <section>
-                <div className="mt-4">
-                    <h2>Fetch User By ID</h2>
-                    <input
-                        type="text"
-                        placeholder="Enter user ID"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        className="form-control mb-2"
-                    />
-                    <button onClick={handleFetchUserById} className="btn btn-info">
-                        Fetch User
-                    </button>
-                    {fetchedUser && (
-                        <div className="card mt-3" style={{ maxWidth: '400px', margin: 'auto' }}>
-                            <div className="card-body text-center">
-                                <img
-                                    src={`http://127.0.0.1:8000/media/${fetchedUser.avatar}`}
-                                    alt="User Avatar"
-                                    style={{
-                                        width: '100px',
-                                        height: '100px',
-                                        borderRadius: '50%',
-                                        objectFit: 'cover',
-                                        marginBottom: '15px',
-                                    }}
-                                    onError={(e) => (e.target.src = '/default-avatar.png')}
-                                />
-                                <h4 className="card-title">{fetchedUser.name}</h4>
-                                <p className="card-text"><strong>ID:</strong> {fetchedUser.id}</p>
-                                <p className="card-text"><strong>Description:</strong> {fetchedUser.description}</p>
-                            </div>
-                        </div>
-                    )}
-
-                </div>
-            </section> */}
+        <div> <UpdateNameComponent setUserName={setUserName} /> </div>
+            <div> <FetchUserById /> </div>
+            <div> <UpdatePassword /> </div>
         </div>
     );
 };
