@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import UpdateName from '../updateData';
 import { Link } from 'react-router-dom';
+import styles from '../../styles.css'
 
 const Profile = () => {
     const [userName, setUserName] = useState('');
@@ -66,10 +67,7 @@ const Profile = () => {
 
 
     const handlePasswordChange = async () => {
-        if (!newPassword.trim()) {
-            setMessage({ text: 'Password cannot be empty.', type: 'error' });
-            return;
-        }
+        console.log('Password change handler');
     };
 
     useEffect(() => {
@@ -85,16 +83,12 @@ const Profile = () => {
         <div className="border shadow-lg rounded p-4">
             {/* Avatar and Greeting Section */}
             <section className="mb-4">
-                <div className="d-flex align-items-center">
+                <div className="d-flex justify-content-start align-items-center">
                     <img
                         src={userAvatar}
+                        id='profile-avatar'
                         alt="User Avatar"
-                        style={{
-                            width: '120px',
-                            height: '120px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                        }}
+                        className="profile-avatar"
                         onError={(e) => (e.target.src = '/default-avatar.png')} // Fallback if image fails to load
                     />
                     <h1 className="ms-4">Hello, {userName}!</h1>
