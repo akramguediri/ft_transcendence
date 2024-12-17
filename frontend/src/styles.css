@@ -4,4 +4,12 @@
     border-radius: 50%;
     object-fit: cover;
   }
+
   
+  .btn-password {
+    max-width: 300px;
+  }
+  
+  input {
+    max-width: 300px;
+  }
