@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import GetCSRFToken from '../getCSRFToken';
 import { Link, useNavigate } from 'react-router-dom';
+import styles from '../../styles.css';
 
 const UserRegistry = () => {
     const [user_name, setUserName] = useState('');
@@ -75,8 +76,8 @@ const UserRegistry = () => {
     };
 
     return (
-        <div className="d-flex justify-content-center align-items-start" style={{ minHeight: '100vh', marginTop: '8rem' }}>
-            <form onSubmit={handleFormSubmit} className="mb-4 p-4 shadow rounded" style={{ width: '300px' }}>
+        <div className="d-flex justify-content-center align-items-start user-registry">
+            <form onSubmit={handleFormSubmit} className="mb-4 p-4 shadow rounded form-registry">
                 <div className="mb-3">
                     <input
                         type="text"

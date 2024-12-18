@@ -1,6 +1,7 @@
 import React from 'react';
 import { hero_42 } from '../assets';
 import Navbar from './Navbar';
+import styles from '../styles.css';
 
 
 const HomePage = () => (
@@ -16,21 +17,10 @@ const HomePage = () => (
             }}
         >
             <div
-                className="background-overlay"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                }}
+                className="background-overlay navbarStyle"
             >
                 <div className="container text-center text-white">
                     <h1>Welcome to our project ft_transcendence</h1>
-                    <p>
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptates consectetur ex tenetur ullam
-                        laudantium nihil vel in, recusandae aliquid, dolor maxime repellendus quam, obcaecati fuga
-                        exercitationem iure officia fugit. Obcaecati.
-                    </p>
                 </div>
             </div>
         </section>

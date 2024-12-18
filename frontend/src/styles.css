@@ -13,3 +13,19 @@
   input {
     max-width: 300px;
   }
+
+  .user-registry {
+    min-height: 100vh; 
+    margin-top: 8rem; 
+  }
+
+  .form-registry {
+    max-width: 300px;
+  }
+
+  .navbarStyle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
