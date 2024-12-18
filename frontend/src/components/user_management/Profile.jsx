@@ -105,7 +105,6 @@ const Profile = () => {
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             className="form-control"
-                            style={{ maxWidth: '300px' }}
                         />
                         <button
                             onClick={handleNameChange}
