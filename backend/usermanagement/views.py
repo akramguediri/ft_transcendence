@@ -169,7 +169,6 @@ def updateName(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_exempt  # Disable CSRF protection for testing (not recommended for production)
 def fetchUserById(request):
     if request.method != "POST":
         return JsonResponse({"msg": "Invalid request method", "status": "error"}, status=405)
@@ -243,7 +242,6 @@ def updateDescription(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
-@csrf_protect
 def update_avatar(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -267,7 +265,6 @@ def update_avatar(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_protect
 @login_required
 def fetch_user_friends(request):
     if request.method != "GET":
@@ -297,7 +294,6 @@ def fetch_user_friends(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
-@csrf_protect
 def is_blocked(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -325,7 +321,6 @@ def is_blocked(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 
-@csrf_protect
 @login_required
 def fetch_user_friends(request):
     if request.method != "GET":
@@ -355,7 +350,6 @@ def fetch_user_friends(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
     
 @login_required
-@csrf_protect
 def add_friend(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -390,7 +384,6 @@ def add_friend(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
-@csrf_protect
 def remove_friend(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -421,7 +414,6 @@ def remove_friend(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
     
 @login_required
-@csrf_protect
 def block_user(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -458,7 +450,6 @@ def block_user(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
     
 @login_required
-@csrf_protect
 def unblock_user(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -494,7 +485,6 @@ def unblock_user(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
-@csrf_protect
 def fetch_blocked_users(request):
     if request.method != "GET":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
