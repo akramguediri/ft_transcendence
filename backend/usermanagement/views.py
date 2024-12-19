@@ -169,10 +169,13 @@ def updateName(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@csrf_exempt  # Disable CSRF protection for testing (not recommended for production)
+# @csrf_exempt
 def fetchUserById(request):
     if request.method != "POST":
         return JsonResponse({"msg": "Invalid request method", "status": "error"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"msg": "User not authenticated", "status": "error"}, status=401)
 
     try:
         body = json.loads(request.body)
@@ -357,17 +360,21 @@ def fetch_user_friends(request):
 @login_required
 @csrf_protect
 def add_friend(request):
+
+@login_required
+@csrf_protect
+def is_blocked(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
 
     try:
         user = request.user
         data = json.loads(request.body)
+        data = json.loads(request.body)  # Parse request body
         user_id = data.get('user_id')
 
         if not user_id:
             return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
-
         friend_user = MyUser.objects.filter(id=user_id).first()
         if not friend_user:
             return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
@@ -387,12 +394,19 @@ def add_friend(request):
             'msg': 'Friend added successfully',
             'data': {
                 'user_id': user_id
+        # Check if the user_id is in the current user's blocklist
+        is_blocked = Friend.objects.filter(user=user, friend_id=user_id, is_blocked=True).exists()
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'user_id': user_id,
+                'is_blocked': is_blocked
             }
         })
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-
 @login_required
 @csrf_protect
 def remove_friend(request):
