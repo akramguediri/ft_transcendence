@@ -332,7 +332,7 @@ def fetch_user_friends(request):
 
     try:
         user = request.user
-        friends = Friend.objects.filter(user=user, is_blocked=False)
+        friends = Friend.objects
         friend_list = [
             {
                 'id': friend.friend.id,
@@ -365,15 +365,11 @@ def add_friend(request):
         user_id = data.get('user_id')
 
         if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
 
         friend_user = MyUser.objects.filter(id=user_id).first()
         if not friend_user:
             return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
-
-        is_blocked = Friend.objects.filter(user=friend_user, friend=user, is_blocked=True).exists()
-        if is_blocked:
-            return JsonResponse({'status': 'error', 'msg': 'You are blocked by this user'}, status=403)
 
         existing_friendship = Friend.objects.filter(user=user, friend=friend_user).exists()
         if existing_friendship:
@@ -404,11 +400,11 @@ def remove_friend(request):
         user_id = data.get('user_id')
 
         if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+            return JsonResponse({'status': 'error', 'msg': 'user_not_found'}, status=404)
 
         friendship = Friend.objects.filter(user=user, friend_id=user_id).first()
-        if not friendship:
-            return JsonResponse({'status': 'error', 'msg': 'Friendship not found'}, status=404)
+        # if not friendship:
+        #     return JsonResponse({'status': 'error', 'msg': 'Friendship not found'}, status=404)
 
         friendship.delete()
 
@@ -431,28 +427,23 @@ def block_user(request):
 
     try:
         user = request.user
-        data = json.loads(request.body)  # Parse request body
+        data = json.loads(request.body)
         user_id = data.get('user_id')
 
         if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
 
-        # Ensure the user exists
         target_user = MyUser.objects.filter(id=user_id).first()
         if not target_user:
             return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
 
-        # Check if the user is already blocked
-        friendship = Friend.objects.filter(user=user, friend=target_user).first()
-        if friendship and friendship.is_blocked:
+        blocked_entry = Friend.objects.filter(user=user, friend=target_user, is_blocked=True).first()
+        if blocked_entry:
             return JsonResponse({'status': 'error', 'msg': 'User is already blocked'}, status=400)
 
-        # Block the user
-        if friendship:
-            friendship.is_blocked = True
-            friendship.save()
-        else:
-            Friend.objects.create(user=user, friend=target_user, is_blocked=True)
+        Friend.objects.filter(user=user, friend=target_user, is_blocked=False).delete()
+
+        Friend.objects.create(user=user, friend=target_user, is_blocked=True)
 
         return JsonResponse({
             'status': 'success',
@@ -464,7 +455,7 @@ def block_user(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-
+    
 @login_required
 @csrf_protect
 def unblock_user(request):
@@ -477,7 +468,7 @@ def unblock_user(request):
         user_id = data.get('user_id')
 
         if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
+            return JsonResponse({'status': 'error', 'msg': 'user_not_found'}, status=404)
 
         target_user = MyUser.objects.filter(id=user_id).first()
         if not target_user:
