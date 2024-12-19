@@ -522,3 +522,4 @@ def fetch_blocked_users(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+ 
