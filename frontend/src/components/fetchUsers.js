@@ -13,4 +13,4 @@ async function fetchUsers() {
 	return data;
 }
 
-export default fetchUsers
+export default GetAllStudents;

@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("fetchUserById", views.fetchUserById, name="fetchUserById"),
     path("fetchUsers", views.fetchUsers, name="fetchUsers"),
     path("csrf", views.csrf, name="csrf"),
     path("register", views.registerUser, name="registerUser"),
@@ -21,3 +20,4 @@ urlpatterns = [
     path('unblockuser', views.unblock_user, name='unblock_user'),
     path('fetchblockedusers', views.fetch_blocked_users, name='fetch_blocked_users'),
 ]
+
