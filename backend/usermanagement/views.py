@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 import json
 from .models import MyUser
 from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
 
@@ -320,7 +320,6 @@ def is_blocked(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-
 @login_required
 def fetch_user_friends(request):
     if request.method != "GET":
@@ -512,4 +511,3 @@ def fetch_blocked_users(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
- 

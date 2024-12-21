@@ -24,12 +24,12 @@ const LoginUser = () => {
 
         setLoading(true);
         try {
-            const csrfToken = await GetCSRFToken();
+            const csrfToken = await GetCSRFToken(); // Fetch the CSRF token
             const response = await fetch('http://127.0.0.1:8000/usermanagement/login', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': csrfToken, // Include CSRF token
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ user_name, password }),
@@ -42,7 +42,8 @@ const LoginUser = () => {
                 console.log('User data:', data);
                 navigate('/home-page');
             } else {
-                setError(data.msg || 'Failed to login. Please try again.');
+                const errorData = await response.json();
+                setError(errorData.msg || 'Failed to login. Please try again.');
             }
         } catch (error) {
             console.error('Error logging in:', error);

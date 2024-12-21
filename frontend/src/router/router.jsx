@@ -3,6 +3,7 @@ import HomePage from "../components/HomePage";
 import UserRegistry from "../components/user_management/UserRegistry";
 import LoginUser from "../components/user_management/LoginUser";
 import Profile from "../components/user_management/Profile";
+import InvitationFriends from "../components/user_management/InvitationFriends";
 
 
 export const router = createBrowserRouter([
@@ -21,5 +22,9 @@ export const router = createBrowserRouter([
     {
         path: 'user-profile',
         element: <Profile />,
+    },
+    {
+        path: 'invitation',
+        element: <InvitationFriends />,
     }
 ]);
