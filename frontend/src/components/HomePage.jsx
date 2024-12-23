@@ -1,5 +1,5 @@
 import React from 'react';
-import { anass_picture, hama_picture, hero_42 } from '../assets';
+import { akram_picture, anass_picture, hama_picture, hero_42, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 
@@ -64,7 +64,7 @@ const HomePage = () => (
         {/* Team Members */}
         <div className="row">
           <TeamCard
-            image="toff1.png"
+            image={milad_picture}
             name="Milad"
             description="Milad is a passionate developer with expertise in fullstack development."
           />
@@ -74,7 +74,7 @@ const HomePage = () => (
             description="Ihama specializes in Frontend development, ensuring a seamless user experience for all users."
           />
           <TeamCard
-            image="3.png"
+            image={akram_picture}
             name="Akram"
             description="Akram is our backend wizard."
           />

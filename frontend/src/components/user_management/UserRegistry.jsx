@@ -25,6 +25,16 @@ const UserRegistry = () => {
         }
     };
 
+    const handleLoginWith42 = () => {
+        const CLIENT_ID_42 = "from_42_intra_api_settings";
+        const REDIRECT_URI = "http://localhost:3000"; // Update with your redirect URI
+        const AUTH_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${CLIENT_ID_42}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+        
+        // Redirect the user to the 42 login page
+        window.location.href = AUTH_URL;
+    };
+
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (!termAccepted) {
@@ -57,14 +67,14 @@ const UserRegistry = () => {
             });
 
             const responseData = await response.json();
-            
+
             if (!response.ok) {
                 if (responseData.msg === 'User already exists') {
                     setUserNameExistsError(true); // Display error
                 } else {
                     alert(responseData.msg || 'Failed to create user');
                 }
-                return; 
+                return;
             }
             alert('User created successfully!');
             navigate('/login');
@@ -78,7 +88,23 @@ const UserRegistry = () => {
     return (
         <div className="d-flex justify-content-center align-items-start user-registry">
             <form onSubmit={handleFormSubmit} className="mb-4 p-4 shadow rounded form-registry">
-                <div className="mb-3">
+                <div>
+                    <button
+                        type="button" // Changed to button type to prevent default form submission
+                        className="btn btn-primary btn-sm w-100 mb-3"
+                        onClick={handleLoginWith42} // Attach the login handler
+                    >
+                        Login with 42 Account
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center py-3 position-relative">
+                    <div class="flex-grow-1 border-top border-secondary"></div>
+                    <span class="mx-3 text-muted">or</span>
+                    <div class="flex-grow-1 border-top border-secondary"></div>
+                </div>
+
+                <div className="mb-3 mt-3">
                     <input
                         type="text"
                         placeholder="Username"
