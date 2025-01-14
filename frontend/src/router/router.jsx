@@ -4,6 +4,7 @@ import UserRegistry from "../components/user_management/UserRegistry";
 import LoginUser from "../components/user_management/LoginUser";
 import Profile from "../components/user_management/Profile";
 import InvitationFriends from "../components/user_management/InvitationFriends";
+import SecureRoute from "../components/SecureRoute";
 
 
 export const router = createBrowserRouter([
@@ -21,10 +22,18 @@ export const router = createBrowserRouter([
     },
     {
         path: 'user-profile',
-        element: <Profile />,
+        element:(
+            <SecureRoute>
+                <Profile />
+            </SecureRoute>
+        ),
     },
     {
         path: 'invitation',
-        element: <InvitationFriends />,
+        element: (
+            <SecureRoute>
+                <InvitationFriends />
+            </SecureRoute>
+        )
     }
 ]);
