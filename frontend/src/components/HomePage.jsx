@@ -1,5 +1,5 @@
 import React from 'react';
-import { akram_picture, anass_picture, hama_picture, hero_42, milad_picture } from '../assets';
+import { akram_picture, hama_picture, milad_picture, pong } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 
@@ -47,6 +47,30 @@ const HomePage = () => (
       </div>
     </section>
 
+    {/* explain how the Game working */}
+
+    <section id="game" className="py-5">
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-6">
+            <h2>How the Game Works</h2>
+            <p className="lead">
+              ft_transcendence is a multiplayer game that allows users to play against each other in real-time. The game
+              is built using the latest web technologies, ensuring a seamless gaming experience for all users.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos minima fuga quaerat provident itaque
+              quas eligendi praesentium. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos minima fuga
+              quaerat provident itaque quas eligendi praesentium.
+            </p>
+          </div>
+          <div className="col-lg-6">
+            <img src={pong} alt="Game Screenshot" className="img-fluid rounded" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     {/* Team Section */}
     <section id="auteur" className="py-5 bg-light">
       <div className="container">
@@ -54,7 +78,7 @@ const HomePage = () => (
         <div className="row text-center mb-4">
           <div className="col">
             <h1 className="text-primary">The Team</h1>
-            <p>
+            <p className='lead text-secondary'>
               Meet our amazing team dedicated to building ft_transcendence. Lorem ipsum dolor sit amet, consectetur
               adipisicing elit. Dignissimos minima fuga quaerat provident itaque quas eligendi praesentium.
             </p>
@@ -77,11 +101,6 @@ const HomePage = () => (
             image={akram_picture}
             name="Akram"
             description="Akram is our backend wizard."
-          />
-          <TeamCard
-            image={anass_picture}
-            name="Anass"
-            description="Anass is the go-to person for DevOps and ensuring smooth deployments."
           />
         </div>
       </div>
