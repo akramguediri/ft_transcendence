@@ -58,11 +58,6 @@ const HomePage = () => (
               ft_transcendence is a multiplayer game that allows users to play against each other in real-time. The game
               is built using the latest web technologies, ensuring a seamless gaming experience for all users.
             </p>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos minima fuga quaerat provident itaque
-              quas eligendi praesentium. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos minima fuga
-              quaerat provident itaque quas eligendi praesentium.
-            </p>
           </div>
           <div className="col-lg-6">
             <img src={pong} alt="Game Screenshot" className="img-fluid rounded" />
