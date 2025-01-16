@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import GetCSRFToken from '../getCSRFToken';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../../styles.css';
+import Get42Token from './Get42Token';
 
 const UserRegistry = () => {
     const [user_name, setUserName] = useState('');
@@ -12,6 +13,9 @@ const UserRegistry = () => {
     const [termAccepted, setTermAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [termInvalid, setTermInvalid] = useState(false);
+    const urlParams = new URLSearchParams(window.location.search);
+    const {token_code} = Get42Token(urlParams.get('code'));
+
     const navigate = useNavigate();
 
     const togglePasswordVisibility = () => {
@@ -25,14 +29,15 @@ const UserRegistry = () => {
         }
     };
 
+    // const handleLoginWith42 = () => {
+    //     const AUTH_URL = process.env.REDIRECT_URI
+    //     // Redirect the user to the 42 login page
+    //     window.location.href = AUTH_URL;
+    // };
     const handleLoginWith42 = () => {
-        const CLIENT_ID_42 = "from_42_intra_api_settings";
-        const REDIRECT_URI = "http://localhost:3000"; // Update with your redirect URI
-        const AUTH_URL = `https://api.intra.42.fr/oauth/authorize?client_id=${CLIENT_ID_42}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
-        
-        // Redirect the user to the 42 login page
-        window.location.href = AUTH_URL;
+        window.location.href = process.env.REDIRECT_URI;
     };
+    
 
 
     const handleFormSubmit = async (e) => {
@@ -84,6 +89,10 @@ const UserRegistry = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log(token_code);
+        }, [token_code]);
 
     return (
         <div className="d-flex justify-content-center align-items-start user-registry">
