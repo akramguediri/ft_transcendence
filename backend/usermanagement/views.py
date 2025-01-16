@@ -2,12 +2,18 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
-import json
+import json, os , requests
 from .models import MyUser
 from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
+
+
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+REACT_PORT = os.environ.get('REACT_PORT')
+HOST_NAME = os.environ.get('HOST_NAME')
+HTTP_METHOD = os.environ.get('HTTP_METHOD')
+REDIRECTION_URL = HTTP_METHOD + '://' + HOST_NAME + ':' + REACT_PORT 
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
@@ -511,3 +517,22 @@ def fetch_blocked_users(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+    
+
+def get_42_token(request):
+    code = json.loads(request.body.decode('utf-8'))
+    url_token = 'https://api.intra.42.fr/oauth/token'
+    params = {
+        'grant_type': 'authorization_code',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'code': code['code'],
+        'redirect_uri': REDIRECTION_URL
+    }
+    token_call = requests.post(url_token, data=params)
+    data_response = token_call.json()
+    # Check if the API returned an error
+    if 'error' in data_response:
+        return JsonResponse({'error': 'Failed to communicate with 42 API'}, status=400)
+    # Success: Return the token data
+    return JsonResponse(data_response)
