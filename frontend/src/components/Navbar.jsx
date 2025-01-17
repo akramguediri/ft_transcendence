@@ -20,7 +20,6 @@ const Navbar = () => {
             alert('An unexpected error occurred during logout.');
         }
     };
-
     return (
         <nav className="navbar navbar-expand-md bg-light navbar-light fixed-top">
             <div className="container">
