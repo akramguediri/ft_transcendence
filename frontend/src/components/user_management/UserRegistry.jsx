@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import GetCSRFToken from '../getCSRFToken';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../../styles.css';
-import Get42Token from './Get42Token';
 
 const UserRegistry = () => {
     const [user_name, setUserName] = useState('');
@@ -13,8 +12,6 @@ const UserRegistry = () => {
     const [termAccepted, setTermAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [termInvalid, setTermInvalid] = useState(false);
-    const urlParams = new URLSearchParams(window.location.search);
-    const {token_code} = Get42Token(urlParams.get('code'));
 
     const navigate = useNavigate();
 
@@ -29,12 +26,6 @@ const UserRegistry = () => {
         }
     };
 
-    // const handleLoginWith42 = () => {
-    //     const AUTH_URL = process.env.REDIRECT_URI
-    //     // Redirect the user to the 42 login page
-    //     window.location.href = AUTH_URL;
-    // };
-    console.log('AUTH_URL:', process.env);
     const handleLoginWith42 = () => {
         const AUTH_URL = process.env.REACT_APP_REDIRECT_URI;
         window.location.href = AUTH_URL;
@@ -91,11 +82,6 @@ const UserRegistry = () => {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        console.log(token_code);
-        }, [token_code]);
-
     return (
         <div className="d-flex justify-content-center align-items-start user-registry">
             <form onSubmit={handleFormSubmit} className="mb-4 p-4 shadow rounded form-registry">
@@ -109,10 +95,10 @@ const UserRegistry = () => {
                     </button>
                 </div>
 
-                <div class="d-flex align-items-center py-3 position-relative">
-                    <div class="flex-grow-1 border-top border-secondary"></div>
-                    <span class="mx-3 text-muted">or</span>
-                    <div class="flex-grow-1 border-top border-secondary"></div>
+                <div className="d-flex align-items-center py-3 position-relative">
+                    <div className="flex-grow-1 border-top border-secondary"></div>
+                    <span className="mx-3 text-muted">or</span>
+                    <div className="flex-grow-1 border-top border-secondary"></div>
                 </div>
 
                 <div className="mb-3 mt-3">
