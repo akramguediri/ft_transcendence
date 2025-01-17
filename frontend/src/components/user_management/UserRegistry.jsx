@@ -34,8 +34,10 @@ const UserRegistry = () => {
     //     // Redirect the user to the 42 login page
     //     window.location.href = AUTH_URL;
     // };
+    console.log('AUTH_URL:', process.env);
     const handleLoginWith42 = () => {
-        window.location.href = process.env.REDIRECT_URI;
+        const AUTH_URL = process.env.REACT_APP_REDIRECT_URI;
+        window.location.href = AUTH_URL;
     };
     
 
