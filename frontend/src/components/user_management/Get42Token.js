@@ -1,38 +1,28 @@
-import React, { useEffect, useState } from 'react'
 import GetCSRFToken from '../getCSRFToken'
 
-const Get42Token = (code) => {
-    const [token, setToken] = useState('')
+const Get42Token = async (code) => {
 
-    useEffect(() => {
-        const fetchAccessToken = async () => {
-            try{
-                const response = await fetch( 'http://127.0.0.1:8000/usermanagement/get42token' ,
-                {
-                    method: 'POST',
-                    body: JSON.stringify({ code }),
-                    headers: {
-                        'X-CSRFToken': await GetCSRFToken(),
-                        'Content-Type': 'application/json',
-                    },
-                })
-                const data = await response.json();
-                if (data.error) {
-                    console.error(data.error);
-                } else {
-                    localStorage.setItem('user', JSON.stringify(data));
-                    // Redirect to authenticated page
-                    window.location.href = '/home-page';
-                }
-            }
-            catch (error) {
-                console.error('Error fetching access token:', error);
-            }
-        };
-        if (code) fetchAccessToken();
-    }, [code]);
+    try {
+        const response = await fetch('http://127.0.0.1:8000/usermanagement/get42token', {
+            method: 'POST',
+            body: JSON.stringify({ code }),
+            headers: {
+                'X-CSRFToken': await GetCSRFToken(),
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
 
-  return { token }
-}
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch token');
+        }
 
-export default Get42Token
+        localStorage.setItem('user', JSON.stringify(data));
+        return data;
+    } catch (error) {
+        console.error('Error fetching token:', error);
+        throw error;
+    }
+};
+
+export default Get42Token;
