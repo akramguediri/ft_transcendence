@@ -43,6 +43,8 @@ const HomePage = () => {
         Get42Token(code)
     }
 }, [navigate]);
+
+
   return (
     <>
       {/* Navbar */}
