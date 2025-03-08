@@ -1,5 +1,5 @@
 import React from 'react';
-import { akram_picture, anass_picture, hama_picture, hero_42, milad_picture } from '../assets';
+import { akram_picture, anass_picture, game, hama_picture, hero_42, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 
@@ -47,14 +47,33 @@ const HomePage = () => (
       </div>
     </section>
 
-    {/* Team Section */}
+{/* Team/Auteur Section */}
+<section id="auteur" className="py-5 bg-light">
+  <div className="container">
+    <div className="row align-items-center">
+      <div className="col-md-6 mb-4 mb-md-0">
+        <img src={game} alt="ft_transcendence game screenshot" className="img-fluid rounded shadow-sm" />
+      </div>
+      <div className="col-md-6">
+        <h2 className="fw-bold mb-3">Our Game</h2>
+        <p className="text-secondary lead mb-4">
+          ft_transcendence game is a modern interpretation of the classic Pong game, featuring real-time multiplayer functionality, customizable paddles, and competitive leaderboards.
+        </p>
+        <div className="d-flex gap-3">
+          <button className="btn btn-primary">Play Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
     <section id="auteur" className="py-5 bg-light">
       <div className="container">
         {/* Team Intro */}
         <div className="row text-center mb-4">
           <div className="col">
             <h1 className="text-primary">The Team</h1>
-            <p>
+            <p className="text-secondary">
               Meet our amazing team dedicated to building ft_transcendence. Lorem ipsum dolor sit amet, consectetur
               adipisicing elit. Dignissimos minima fuga quaerat provident itaque quas eligendi praesentium.
             </p>
@@ -77,11 +96,6 @@ const HomePage = () => (
             image={akram_picture}
             name="Akram"
             description="Akram is our backend wizard."
-          />
-          <TeamCard
-            image={anass_picture}
-            name="Anass"
-            description="Anass is the go-to person for DevOps and ensuring smooth deployments."
           />
         </div>
       </div>
