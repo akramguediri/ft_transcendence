@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
 
-
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
@@ -242,37 +241,29 @@ def updateDescription(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-
 @login_required
 def update_avatar(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
     try:
         user = request.user
-        if 'avatar' not in request.FILES:
-            return JsonResponse({'status': 'error', 'msg': 'Avatar file is required'}, status=400)
+        data = json.loads(request.body)
+        new_avatar_url = data.get('new_avatar_url')
 
-        avatar_file = request.FILES['avatar']
-        
-        # Validate file size and type
-        if avatar_file.size > 5 * 1024 * 1024:  # 5MB limit
-            return JsonResponse({'status': 'error', 'msg': 'File size too large'}, status=400)
-        
-        # Optional: validate file type
-        allowed_types = ['image/jpeg', 'image/png', 'image/gif']
-        if avatar_file.content_type not in allowed_types:
-            return JsonResponse({'status': 'error', 'msg': 'Invalid file type'}, status=400)
+        if not new_avatar_url:
+            return JsonResponse({'status': 'error', 'msg': 'New avatar URL is required'}, status=400)
 
-        # Save the file
-        user.avatar = avatar_file
+        user.avatar = new_avatar_url
         user.save()
 
         return JsonResponse({
             'status': 'success',
             'msg': 'Avatar updated successfully',
-            'new_avatar_url': request.build_absolute_uri(user.avatar.url)
         })
-    
+
     except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': str(e)}, status=500)
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
 def fetch_user_friends(request):
