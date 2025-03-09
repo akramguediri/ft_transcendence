@@ -43,6 +43,14 @@ const Profile = () => {
         }
     };
 
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            setUserName(user.name || 'Guest');
+            setUserAvatar(user.avatar ? `http://127.0.0.1:8000/media/${user.avatar}` : '/default-avatar.png'); // Fallback avatar
+        }
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
