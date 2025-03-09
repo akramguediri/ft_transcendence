@@ -16,16 +16,6 @@ const TeamCard = ({ image, name, description }) => (
       <img src={image} className="card-img-top" alt={`${name}'s Avatar`} />
       <div className="card-body">
         <h5 className="card-title">{name}</h5>
-        <p className="card-text">{description}</p>
-        <div className="d-flex justify-content-center">
-          <ul className="list-inline">
-            {socialLinks.map((link, index) => (
-              <li className="list-inline-item" key={index}>
-                <i className={`${link.icon} text-primary`} title={link.platform}></i>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </div>
   </div>
@@ -74,8 +64,7 @@ const HomePage = () => (
           <div className="col">
             <h1 className="text-primary">The Team</h1>
             <p className="text-secondary">
-              Meet our amazing team dedicated to building ft_transcendence. Lorem ipsum dolor sit amet, consectetur
-              adipisicing elit. Dignissimos minima fuga quaerat provident itaque quas eligendi praesentium.
+              Meet our amazing team dedicated to building ft_transcendence.
             </p>
           </div>
         </div>
@@ -85,17 +74,14 @@ const HomePage = () => (
           <TeamCard
             image={milad_picture}
             name="Milad"
-            description="Milad is a passionate developer with expertise in fullstack development."
           />
           <TeamCard
             image={hama_picture}
             name="Ihama"
-            description="Ihama specializes in Frontend development, ensuring a seamless user experience for all users."
           />
           <TeamCard
             image={akram_picture}
             name="Akram"
-            description="Akram is our backend wizard."
           />
         </div>
       </div>
