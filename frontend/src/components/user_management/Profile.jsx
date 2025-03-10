@@ -87,9 +87,6 @@ const Profile = () => {
                     </div>
                     <div className='d-flex gap-4'>
                         <div className="mt-3">
-                            <button className="btn btn-danger">Change Avatar</button>
-                        </div>
-                        <div className="mt-3">
                             <Link to='/home-page' className="btn btn-success text-light">return back to the Home page</Link>
                         </div>
                     </div>
