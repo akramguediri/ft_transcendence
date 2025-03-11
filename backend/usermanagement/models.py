@@ -14,14 +14,14 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(user_name, password, **extra_fields)
 
 class MyUser(AbstractBaseUser):
-    user_name = models.CharField(max_length=30, unique=True)  
+    user_name = models.CharField(max_length=30, unique=True)
     name = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True, null=True)
-    avatar = models.TextField(blank=True, default='Avatars/default-avatar.jpg')
+    avatar = models.ImageField(upload_to='Avatars/', blank=True, null=True, default='Avatars/default-avatar.png')
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'user_name'   
-    REQUIRED_FIELDS = ['name']   
+    USERNAME_FIELD = 'user_name'
+    REQUIRED_FIELDS = ['name']
 
     def __str__(self):
         return self.user_name
@@ -36,4 +36,3 @@ class Friend(models.Model):
 
     def __str__(self):
         return f"{self.user.user_name} -> {self.friend.user_name} (Blocked: {self.is_blocked})"
-
