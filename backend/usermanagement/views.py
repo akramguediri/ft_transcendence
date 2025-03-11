@@ -227,7 +227,7 @@ def fetchUserById(request):
             "id": user.id,
             "name": user.name,
             "description": user.description,
-            "avatar": user.avatar
+            "avatar": request.build_absolute_uri(user.avatar.url) if user.avatar else request.build_absolute_uri('/media/Avatars/default-avatar.png')
         }
         return JsonResponse({"msg": "User fetched successfully", "status": "success", "data": {"user": user_data}})
     except json.JSONDecodeError:
