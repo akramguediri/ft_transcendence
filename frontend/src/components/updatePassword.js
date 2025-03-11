@@ -1,4 +1,4 @@
-import GetCSRFToken from './getCSRFToken';
+import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
 
 export const updatePassword = async (oldPassword, newPassword, newPasswordConfirm) => {
     const requestData = {
@@ -13,7 +13,7 @@ export const updatePassword = async (oldPassword, newPassword, newPasswordConfir
             credentials: 'include',
             body: JSON.stringify(requestData),
             headers: {
-                'X-CSRFToken': await GetCSRFToken(),
+                'X-CSRFToken': getCSRFTokenFromCookies(),
                 'Content-Type': 'application/json',
             },
         });
