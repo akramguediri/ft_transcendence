@@ -4,6 +4,7 @@ import UserRegistry from "../components/user_management/UserRegistry";
 import LoginUser from "../components/user_management/LoginUser";
 import Profile from "../components/user_management/Profile";
 import InvitationFriends from "../components/user_management/InvitationFriends";
+import FetchUserById from "../components/user_management/FetchUserById";
 
 
 export const router = createBrowserRouter([
@@ -26,5 +27,9 @@ export const router = createBrowserRouter([
     {
         path: 'invitation',
         element: <InvitationFriends />,
+    },
+    {
+        path: 'fetch-user',
+        element: <FetchUserById />,
     }
 ]);
