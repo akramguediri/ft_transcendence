@@ -18,55 +18,54 @@ const FetchUserById = () => {
                 return;
             }
             const data = response.data;
-            if (data.status === 'success') {
-                setFetchedUser(data.data.user);
-            } else {
-                setError(data.msg || 'Error fetching user.');
-            }
+            setFetchedUser(data.data.user);
         } catch (error) {
             setError('Error fetching user.');
         }
-
     };
 
     return (
-        <div className="mt-4">
-            <h2>Fetch User By ID</h2>
-            <input
-                type="text"
-                placeholder="Enter user ID"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                className="form-control mb-2"
-            />
-            <button onClick={handleFetchUserById} className="btn btn-info">
-                Fetch User
-            </button>
-            {error && <p className="text-danger small">{error}</p>}
+        <div className="container mt-4">
+            <h2 className="text-center mb-4 fw-semibold">Fetch User By ID</h2>
+    
+            {/* Input Group */}
+            <div className="input-group mb-3 mx-auto" style={{ maxWidth: "500px" }}>
+                <input
+                    type="text"
+                    placeholder="Enter user ID"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    className="form-control"
+                />
+                <button onClick={handleFetchUserById} className="btn btn-info">
+                    Fetch User
+                </button>
+            </div>
+    
+            {/* Error Message */}
+            {error && <p className="text-danger text-center fw-semibold">{error}</p>}
+    
+            {/* User Card */}
             {fetchedUser && (
-                <div className="card mt-3" style={{ maxWidth: '400px', margin: 'auto' }}>
-                    <div className="card-body text-center">
-                        <h3>User Details:</h3>
+                <div className="card shadow-sm mt-4 mx-auto border-0 rounded-3" style={{ maxWidth: "500px" }}>
+                    <div className="d-flex align-items-center p-3">
                         <img
-                            src={`http://127.0.0.1:8000/media/${fetchedUser.avatar}`}
+                            src={fetchedUser.avatar}
                             alt="User Avatar"
-                            style={{
-                                width: '100px',
-                                height: '100px',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                marginBottom: '15px',
-                            }}
-                            onError={(e) => (e.target.src = '/default-avatar.png')}
+                            className="rounded-circle border"
+                            style={{ width: "90px", height: "90px", objectFit: "cover" }}
                         />
-                        <p><strong>ID:</strong> {fetchedUser.id}</p>
-                        <p><strong>Name:</strong> {fetchedUser.name}</p>
-                        <p><strong>Description:</strong> {fetchedUser.description}</p>
+                        <div className="ms-3">
+                            <h4 className="fw-semibold text-dark mb-1">{fetchedUser.name}</h4>
+                            <p className="mb-1"><strong>ID:</strong> {fetchedUser.id}</p>
+                            <p className="text-muted mb-0"><strong>Description:</strong> {fetchedUser.description || 'No description available'}</p>
+                        </div>
                     </div>
                 </div>
             )}
         </div>
     );
+    
 };
 
 export default FetchUserById;
