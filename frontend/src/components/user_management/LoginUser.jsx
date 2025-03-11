@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import GetCSRFToken from '../getCSRFToken';
+import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
 
 const LoginUser = () => {
     const [user_name, setUserName] = useState('');
@@ -21,32 +21,35 @@ const LoginUser = () => {
             setError('Please fill in all required fields.');
             return;
         }
-
+    
         setLoading(true);
         try {
-            const csrfToken = await GetCSRFToken(); // Fetch the CSRF token
+            const dt = {
+                user_name,
+                password,
+            };
             const response = await fetch('http://127.0.0.1:8000/usermanagement/login', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'X-CSRFToken': csrfToken, // Include CSRF token
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_name, password }),
+                body: JSON.stringify(dt),
             });
-
+    
             const data = await response.json();
-            if (data.status === 'success') {
+    
+            if (response.ok) {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 alert('Login successful!');
-                console.log('User data:', data);
                 navigate('/home-page');
             } else {
-                const errorData = await response.json();
-                setError(errorData.msg || 'Failed to login. Please try again.');
+                setError(data.msg || 'Failed to login. Please try again.');
             }
         } catch (error) {
             console.error('Error logging in:', error);
+            setError('An unexpected error occurred. Please try again later.');
         } finally {
             setLoading(false);
         }

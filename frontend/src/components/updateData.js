@@ -1,4 +1,4 @@
-import GetCSRFToken from './getCSRFToken';
+import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
 
 async function UpdateName({name, new_name}) {
 	const response = await fetch('http://127.0.0.1:8000/usermanagement/updateName', {
@@ -9,7 +9,7 @@ async function UpdateName({name, new_name}) {
 				new_name : new_name,
 			}),
 		headers: {
-			'X-CSRFToken': await GetCSRFToken(),
+			'X-CSRFToken': getCSRFTokenFromCookies(),
 			'Content-Type': 'application/json'
 		},
 	})

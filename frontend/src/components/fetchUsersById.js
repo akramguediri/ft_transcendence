@@ -1,4 +1,4 @@
-import GetCSRFToken from './getCSRFToken';
+import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
 
 async function fetchUsersById(userId) {
 	const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchUserById', {
@@ -8,7 +8,7 @@ async function fetchUsersById(userId) {
 			user_id: userId,
 		}),
 		headers: {
-			'X-CSRFToken': await GetCSRFToken(),
+			'X-CSRFToken': getCSRFTokenFromCookies(),
 			'Content-Type': 'application/json',
 		},
 	});
