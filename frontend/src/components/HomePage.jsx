@@ -1,13 +1,7 @@
 import React from 'react';
-import { akram_picture, anass_picture, game, hama_picture, hero_42, milad_picture } from '../assets';
+import { akram_picture, game, hama_picture, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
-
-const socialLinks = [
-  { platform: 'linkedin', icon: 'bi bi-linkedin' },
-  { platform: 'instagram', icon: 'bi bi-instagram' },
-  { platform: 'twitter', icon: 'bi bi-twitter' },
-];
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (

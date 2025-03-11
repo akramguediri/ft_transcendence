@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import GetCSRFToken from '../getCSRFToken';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from '../../styles.css';
+import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
 
 const UserRegistry = () => {
     const [user_name, setUserName] = useState('');
@@ -51,7 +50,7 @@ const UserRegistry = () => {
                 credentials: 'include',
                 body: JSON.stringify(data),
                 headers: {
-                    'X-CSRFToken': await GetCSRFToken(),
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
                     'Content-Type': 'application/json',
                 },
             });
@@ -150,7 +149,7 @@ const UserRegistry = () => {
                                 id="termsCheckbox"
                             />
                             <label className="form-check-label small" htmlFor="termsCheckbox">
-                                I agree to the <a href="#" className="text-primary">Terms & Conditions</a>.
+                                I agree to the <span className="text-primary">Terms & Conditions</span>.
                             </label>
                         </div>
                         {termInvalid && <p className="text-danger small">Please accept the terms and conditions.</p>}

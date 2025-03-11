@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import UpdateName from '../updateData';
 import { Link, useNavigate } from 'react-router-dom';
 import { updatePassword } from '../updatePassword';
+import getCSRFTokenFromCookies from '../token/GetTokenFromCookies'; // Ensure this is imported
 import styles from '../../styles.css';
 
 const Profile = () => {
@@ -10,11 +11,12 @@ const Profile = () => {
     const [userAvatar, setUserAvatar] = useState('');
     const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
     const [newName, setNewName] = useState('');
-    const [message, setMessage] = useState({ text: '', type: '' }); // To handle success or error states
-    const [newPassword, setNewPassword] = useState(''); // Add state for new password
+    const [message, setMessage] = useState({ text: '', type: '' });
+    const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [avatarFile, setAvatarFile] = useState(null); // State for the avatar file
 
     const navigate = useNavigate();
 
@@ -43,13 +45,67 @@ const Profile = () => {
         }
     };
 
+    const handleAvatarChange = (e) => {
+        setAvatarFile(e.target.files[0]);
+    };
+
+    const handleAvatarUpload = async () => {
+        if (!avatarFile) {
+            setMessage({ text: 'Please select an avatar file to upload.', type: 'error' });
+            return;
+        }
+    
+        const formData = new FormData();
+        formData.append('avatar', avatarFile);
+    
+        try {
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/updateAvatar', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
+                },
+                body: formData,
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                // Construct the full URL for the new avatar
+                const newAvatarUrl = `http://127.0.0.1:8000${data.avatar_url}`;
+                
+                // Update the state to trigger a re-render
+                setUserAvatar(newAvatarUrl);
+    
+                // Update the local storage with the new avatar URL
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    user.avatar = data.avatar_url; // Store the relative path
+                    localStorage.setItem('user', JSON.stringify(user));
+                    console.log('Updated user in local storage:', user);
+                }
+    
+                setMessage({ text: 'Avatar updated successfully!', type: 'success' });
+            } else {
+                setMessage({ text: data.msg || 'Failed to update avatar.', type: 'error' });
+            }
+        } catch (error) {
+            console.error('Error updating avatar:', error);
+            setMessage({ text: 'An unexpected error occurred. Please try again.', type: 'error' });
+        }
+    };
+    
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
-            setUserName(user.name || 'Guest');
-            setUserAvatar(user.avatar ? `http://127.0.0.1:8000/media/${user.avatar}` : '/default-avatar.png'); // Fallback avatar
+            setUserName(user.name);
+            // Construct the full URL for the avatar
+            const avatarUrl = `http://127.0.0.1:8000${user.avatar}`;
+            setUserAvatar(avatarUrl);
+            console.log('Loaded user from local storage:', user);
         }
     }, []);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -69,7 +125,6 @@ const Profile = () => {
         setLoading(false);
     };
 
-
     return (
         <div className="container mt-5">
             <div className="border shadow-lg rounded p-4">
@@ -81,13 +136,16 @@ const Profile = () => {
                             id='profile-avatar'
                             alt="User Avatar"
                             className="profile-avatar"
-                            onError={(e) => (e.target.src = '/default-avatar.png')} // Fallback if image fails to load
                         />
                         <h1 className="ms-4">Hello, {userName}!</h1>
                     </div>
                     <div className='d-flex gap-4'>
                         <div className="mt-3">
-                            <Link to='/home-page' className="btn btn-success text-light">return back to the Home page</Link>
+                            <input type="file" onChange={handleAvatarChange} />
+                            <button className="btn btn-danger" onClick={handleAvatarUpload}>Change Avatar</button>
+                        </div>
+                        <div className="mt-3">
+                            <Link to='/home-page' className="btn btn-success text-light">Return back to the Home page</Link>
                         </div>
                     </div>
                 </section>
@@ -106,7 +164,7 @@ const Profile = () => {
                         <button
                             onClick={handleNameChange}
                             className="btn btn-primary px-4"
-                            disabled={!newName.trim()} // Disable button if input is empty
+                            disabled={!newName.trim()}
                         >
                             Save
                         </button>
