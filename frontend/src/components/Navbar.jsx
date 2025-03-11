@@ -22,7 +22,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="navbar navbar-expand-md bg-light navbar-light fixed-top">
+        <nav className="navbar navbar-expand-md bg-light navbar-black fixed-top">
             <div className="container">
                 <a className="navbar-brand fw-bold" href="/index.html">
                     <span className="bg-primary bg-gradient p-1 rounded-3 text-light">ft_</span>transcendence
