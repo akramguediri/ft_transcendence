@@ -12,6 +12,41 @@ from .models import MyUser, Friend
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
+
+@csrf_exempt
+@login_required
+def update_avatar(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'msg': 'User not authenticated'}, status=401)
+
+    try:
+        # Check if a file is included in the request
+        if 'avatar' not in request.FILES:
+            return JsonResponse({'status': 'error', 'msg': 'No avatar file provided'}, status=400)
+
+        # Get the uploaded file
+        avatar_file = request.FILES['avatar']
+
+        # Update the avatar of the authenticated user
+        request.user.avatar = avatar_file
+        request.user.save()
+
+        # Return the new avatar URL
+        avatar_url = request.user.avatar.url  # This should give you the correct URL
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': 'Avatar updated successfully!',
+            'avatar_url': avatar_url  # Include the avatar URL in the response
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+    
+
 def fetchUsers(request):
     if request.method != "GET":
         return JsonResponse({'message': 'POSTResponse'})
@@ -46,6 +81,10 @@ def loginUser(request):
             }, status=401)
 
         login(request, user)
+
+        # Get the avatar URL if it exists, otherwise use a default
+        avatar_url = user.avatar.url if user.avatar else '/media/avatar/default-avatar.png'
+
         return JsonResponse({
             'status': 'success',
             'msg': 'Login successful.',
@@ -53,7 +92,7 @@ def loginUser(request):
                 'id': user.id,
                 'user_name': user.user_name,
                 'name': user.name,
-                'avatar': user.avatar,
+                'avatar': avatar_url,
                 'description': user.description,
             }
         }, status=200)
@@ -241,29 +280,6 @@ def updateDescription(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-@login_required
-def update_avatar(request):
-    if request.method != "POST":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        data = json.loads(request.body)
-        new_avatar_url = data.get('new_avatar_url')
-
-        if not new_avatar_url:
-            return JsonResponse({'status': 'error', 'msg': 'New avatar URL is required'}, status=400)
-
-        user.avatar = new_avatar_url
-        user.save()
-
-        return JsonResponse({
-            'status': 'success',
-            'msg': 'Avatar updated successfully',
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
 def fetch_user_friends(request):
