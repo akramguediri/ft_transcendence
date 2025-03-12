@@ -3,7 +3,7 @@ import HomePage from "../components/HomePage";
 import UserRegistry from "../components/user_management/UserRegistry";
 import LoginUser from "../components/user_management/LoginUser";
 import Profile from "../components/user_management/Profile";
-import InvitationFriends from "../components/user_management/InvitationFriends";
+import InvitationFriends from "../components/user_management/invitations/InvitationFriends";
 import FetchUserById from "../components/user_management/FetchUserById";
 
 
