@@ -18,6 +18,7 @@ const Profile = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [avatarFile, setAvatarFile] = useState(null);
     const [showFetchUser, setShowFetchUser] = useState(false);
+    const [activeTab, setActiveTab] = useState("status");
 
     const navigate = useNavigate();
 
@@ -121,147 +122,205 @@ const Profile = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="card shadow-lg border-0 rounded-4 p-4">
-                <section className="mb-4">
-                    <div className="row align-items-start g-4">
-                        {/* Avatar Section */}
-                        <div className="col-lg-4">
-                            <div className="card border-0 shadow-sm">
-                                <img
-                                    src={userAvatar}
-                                    alt="User Avatar"
-                                    className="card-img-top rounded-top"
-                                    style={{ height: "350px", objectFit: "cover" }}
-                                />
-                                <div className="card-body text-center">
-                                    <h5 className="card-title text-dark fw-semibold">Hello, {userName}!</h5>
-                                    <input type="file" onChange={handleAvatarChange} className="form-control mt-3" />
-                                    <div className="d-grid gap-2 mt-3">
-                                        <button className="btn btn-danger" onClick={handleAvatarUpload}>
-                                            Change Avatar
-                                        </button>
-                                        <Link to='/home-page' className="btn btn-success">
-                                            Home
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* User Info & Forms */}
-                        <div className="col-lg-4">
-                            <div className="card border-0 shadow-sm p-4">
-                                {/* Number of Friends */}
-                                <div className="mb-4 text-center">
-                                    <h3 className="fw-semibold">Number of Friends</h3>
-                                    <p className="fs-4 text-primary">1</p>
-                                </div>
-
-                                {/* Update Name */}
-                                <div className="mb-4">
-                                    <h4 className="fw-semibold">Update Your Name</h4>
-                                    <div className="input-group">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter a new name"
-                                            value={newName}
-                                            onChange={(e) => setNewName(e.target.value)}
-                                            className="form-control"
-                                        />
-                                        <button
-                                            onClick={handleNameChange}
-                                            className="btn btn-primary"
-                                            disabled={!newName.trim()}
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Change Password */}
-                                <form onSubmit={handleSubmit}>
-                                    <h4 className="fw-semibold">Change Your Password</h4>
-                                    <div className="mb-3">
-                                        <input
-                                            type="password"
-                                            placeholder="Current password"
-                                            value={oldPassword}
-                                            onChange={(e) => setOldPassword(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <input
-                                            type="password"
-                                            placeholder="New password"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <input
-                                            type="password"
-                                            placeholder="Confirm new password"
-                                            value={newPasswordConfirm}
-                                            onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                                            className="form-control"
-                                            required
-                                        />
-                                    </div>
-
-                                    {/* Feedback Messages */}
-                                    {errorMessage && <p className="text-danger">{errorMessage}</p>}
-                                    {successMessage && <p className="text-success">{successMessage}</p>}
-
-                                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-                                        {loading ? 'Updating...' : 'Update Password'}
+        <div className="container mt-5 bg-secondary p-2">
+            {/*  section for picture and content */}
+            <section>
+                <div className="card mb-3" >
+                    <div className="row g-0">
+                        <div className="col-lg-3 border">
+                            <img
+                                src={userAvatar}
+                                className="img-fluid rounded-start"
+                                alt="User Avatar"
+                            />
+                            <div className='card'>
+                                <input type="file" onChange={handleAvatarChange} className="form-control mt-3" />
+                                <div className="d-grid gap-2 mt-3">
+                                    <button className="btn btn-danger" onClick={handleAvatarUpload}>
+                                        Change Avatar
                                     </button>
-                                </form>
-
-                                {/* Alert Message */}
-                                {message.text && (
-                                    <div className={`alert mt-4 ${message.type === 'success' ? 'alert-success' : 'alert-danger'}`} role="alert">
-                                        {message.text}
-                                    </div>
-                                )}
+                                    <Link to='/home-page' className="btn btn-success">
+                                        Home
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-
-                        {/* List of Friends */}
-                        <div className="col-lg-4">
-                            <div className="card border-0 shadow-sm p-4">
-                                <h3 className="fw-semibold mb-3">List of Friends</h3>
-                                <ul className="list-group">
-                                    List
-                                    {/* {friendsList.length > 0 ? (
-                                        friendsList.map((friend, index) => (
-                                            <li key={index} className="list-group-item">
-                                                {friend.name}
-                                            </li>
-                                        ))
+                        <div className="col-lg-5">
+                            <h5 className="card-title text-dark fw-semibold mx-auto">
+                                Hello, {userName}!
+                            </h5>
+                            <div className="card text-center">
+                                <div className="card-header">
+                                    <ul className="nav nav-pills card-header-pills">
+                                        <li className="nav-item">
+                                            <button
+                                                className={`nav-link ${activeTab === "status" ? "active" : ""}`}
+                                                onClick={() => setActiveTab("status")}
+                                            >
+                                                Status
+                                            </button>
+                                        </li>
+                                        <li className="nav-item">
+                                            <button
+                                                className={`nav-link ${activeTab === "friends" ? "active" : ""}`}
+                                                onClick={() => setActiveTab("friends")}
+                                            >
+                                                Friend List
+                                            </button>
+                                        </li>
+                                        <li className="nav-item">
+                                            <button
+                                                className={`nav-link ${activeTab === "modify" ? "active" : ""}`}
+                                                onClick={() => setActiveTab("modify")}
+                                            >
+                                                Modify your Name
+                                            </button>
+                                        </li>
+                                        <li className="nav-item">
+                                            <button
+                                                className={`nav-link ${activeTab === "change password" ? "active" : ""}`}
+                                                onClick={() => setActiveTab("Modify name")}
+                                            >
+                                                Change Password
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="card-body">
+                                    {activeTab === "status" ? (
+                                        <h5 className="card-title">Online</h5>
+                                    ) : activeTab === "friends" ? (
+                                        <div className="mb-4 text-center">
+                                            <h3 className="fw-semibold">Number of Friends</h3>
+                                            <p className="fs-4 text-primary">1</p>
+                                        </div>
+                                    ) : activeTab === "modify" ? (
+                                        <div className="input-group">
+                                            <input
+                                                type="text"
+                                                placeholder="Enter a new name"
+                                                value={newName}
+                                                onChange={(e) => setNewName(e.target.value)}
+                                                className="form-control"
+                                            />
+                                            <button
+                                                onClick={handleNameChange}
+                                                className="btn btn-primary"
+                                                disabled={!newName.trim()}
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
                                     ) : (
-                                        <p className="text-muted">No friends added yet.</p>
-                                    )} */}
-                                </ul>
+                                        // Change Password
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="mb-3">
+                                                <input
+                                                    type="password"
+                                                    placeholder="Current password"
+                                                    value={oldPassword}
+                                                    onChange={(e) => setOldPassword(e.target.value)}
+                                                    className="form-control"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="mb-3">
+                                                <input
+                                                    type="password"
+                                                    placeholder="New password"
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                    className="form-control"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="mb-3">
+                                                <input
+                                                    type="password"
+                                                    placeholder="Confirm new password"
+                                                    value={newPasswordConfirm}
+                                                    onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                                                    className="form-control"
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* Feedback Messages */}
+                                            {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                                            {successMessage && <p className="text-success">{successMessage}</p>}
+
+                                            <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                                                {loading ? 'Updating...' : 'Update Password'}
+                                            </button>
+                                        </form>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className='col-lg-4'>
+                            <div className="card border-primary mb-3 bg-dark">
+                                <div className="card-header text-white text-center">Achievement</div>
+                                <div className="card-body text-white">
+                                    <div className='d-flex justify-content-between align-items-center'>
+                                        <div >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trophy" viewBox="0 0 16 16">
+                                                <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z" />
+                                            </svg>
+                                            <h5 className="card-title">3 Wins</h5>
+                                        </div>
+                                        <div >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-emoji-frown" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                <path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.5 3.5 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.5 4.5 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
+                                            </svg>
+                                            <h5 className="card-title">5 Loses</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="card shadow-lg border-0 rounded-4 p-4">
+                                {/* Toggle Fetch User */}
+                                <div className="text-center mt-4">
+                                    <button onClick={() => setShowFetchUser(!showFetchUser)} className="btn btn-info">
+                                        {showFetchUser ? 'Hide User Lookup' : 'Show User Lookup'}
+                                    </button>
+                                </div>
+                                {showFetchUser && <FetchUserById />}
                             </div>
                         </div>
                     </div>
-                </section>
-
-
-                {/* Toggle Fetch User */}
-                <div className="text-center mt-4">
-                    <button onClick={() => setShowFetchUser(!showFetchUser)} className="btn btn-info">
-                        {showFetchUser ? 'Hide User Lookup' : 'Show User Lookup'}
-                    </button>
                 </div>
+            </section>
 
-                {showFetchUser && <FetchUserById />}
-            </div>
+            <section className='mt-5'>
+                <div className='card bg-dark'>
+                    <table className="table table-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Game ID</th>
+                                <th scope="col">Player 1</th>
+                                <th scope="col">Player 2</th>
+                                <th scope="col">Result</th>
+                                <th scope="col">Winner</th>
+                                <th scope="col">Loser</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-group-divider">
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>1</td>
+                                <td>Ali</td>
+                                <td>Moussa</td>
+                                <td>3 - 2</td>
+                                <td>Ali</td>
+                                <td>Moussa</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     );
 
