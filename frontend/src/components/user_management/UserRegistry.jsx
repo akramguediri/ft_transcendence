@@ -30,6 +30,11 @@ const UserRegistry = () => {
         }
     };
 
+    const handleLoginWith42 = () => {
+        const AUTH_URL = process.env.REACT_APP_REDIRECT_URI;
+        window.location.href = AUTH_URL;
+    };
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (!termAccepted) {
@@ -96,7 +101,23 @@ const UserRegistry = () => {
                             <h2 className="mt-6 text-2xl font-bold">Welcome to our ft_transcendence Project</h2>
                         </div>
                     </section>
+
                     <div className="col-lg-3 d-flex align-items-center">
+                        <div>
+                            <button
+                                type="button"
+                                className="btn btn-primary btn-sm w-100 mb-3"
+                                onClick={handleLoginWith42}
+                            >
+                                Login with 42 Account
+                            </button>
+                        </div>
+
+                        <div className="d-flex align-items-center py-3 position-relative">
+                            <div className="flex-grow-1 border-top border-secondary"></div>
+                            <span className="mx-3 text-muted">or</span>
+                            <div className="flex-grow-1 border-top border-secondary"></div>
+                        </div>
                         <form onSubmit={handleFormSubmit} className="p-4 shadow rounded bg-white w-100">
                             <div className="mb-3">
                                 <input
