@@ -53,6 +53,9 @@ const Navbar = () => {
                             <Link className="nav-link" to="/invitation">Invitation</Link>
                         </li>
                         <li className="nav-item">
+                            <Link className="nav-link" to="/invitation">Notification</Link>
+                        </li>
+                        <li className="nav-item">
                             <button onClick={handleLogout} className="btn">Logout</button>
                         </li>
                     </ul>
