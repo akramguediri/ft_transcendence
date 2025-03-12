@@ -70,6 +70,8 @@ const Profile = () => {
 
             const data = await response.json();
 
+
+
             if (response.ok) {
                 const newAvatarUrl = `http://127.0.0.1:8000${data.avatar_url}`;
                 setUserAvatar(newAvatarUrl);
@@ -91,10 +93,12 @@ const Profile = () => {
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
+        console.log("user :", user);
         if (user) {
             setUserName(user.name);
-            const avatarUrl = `http://127.0.0.1:8000${user.avatar}`;
+            const avatarUrl = user.avatar ? `http://127.0.0.1:8000${user.avatar}` : 'http://127.0.0.1:8000/media/Avatars/default-avatar.png';
             setUserAvatar(avatarUrl);
+            console.log("avatar icon: ", avatarUrl);
         }
     }, []);
 
@@ -115,14 +119,14 @@ const Profile = () => {
         }
         setLoading(false);
     };
-    
+
     return (
         <div className="container mt-5">
             <div className="card shadow-lg border-0 rounded-4 p-4">
                 <section className="mb-4">
-                    <div className="row align-items-center g-4">
+                    <div className="row align-items-start g-4">
                         {/* Avatar Section */}
-                        <div className="col-lg-5">
+                        <div className="col-lg-4">
                             <div className="card border-0 shadow-sm">
                                 <img
                                     src={userAvatar}
@@ -134,38 +138,50 @@ const Profile = () => {
                                     <h5 className="card-title text-dark fw-semibold">Hello, {userName}!</h5>
                                     <input type="file" onChange={handleAvatarChange} className="form-control mt-3" />
                                     <div className="d-grid gap-2 mt-3">
-                                        <button className="btn btn-danger" onClick={handleAvatarUpload}>Change Avatar</button>
-                                        <Link to='/home-page' className="btn btn-success">Home</Link>
+                                        <button className="btn btn-danger" onClick={handleAvatarUpload}>
+                                            Change Avatar
+                                        </button>
+                                        <Link to='/home-page' className="btn btn-success">
+                                            Home
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* User Info & Forms */}
-                        <div className="col-lg-7">
+                        <div className="col-lg-4">
                             <div className="card border-0 shadow-sm p-4">
-                                {/* Update Name */}
-                                <h4 className="fw-semibold mb-3">Update Your Name</h4>
-                                <div className="input-group mb-4">
-                                    <input
-                                        type="text"
-                                        placeholder="Enter a new name"
-                                        value={newName}
-                                        onChange={(e) => setNewName(e.target.value)}
-                                        className="form-control"
-                                    />
-                                    <button
-                                        onClick={handleNameChange}
-                                        className="btn btn-primary"
-                                        disabled={!newName.trim()}
-                                    >
-                                        Save
-                                    </button>
+                                {/* Number of Friends */}
+                                <div className="mb-4 text-center">
+                                    <h3 className="fw-semibold">Number of Friends</h3>
+                                    <p className="fs-4 text-primary">1</p>
                                 </div>
-    
+
+                                {/* Update Name */}
+                                <div className="mb-4">
+                                    <h4 className="fw-semibold">Update Your Name</h4>
+                                    <div className="input-group">
+                                        <input
+                                            type="text"
+                                            placeholder="Enter a new name"
+                                            value={newName}
+                                            onChange={(e) => setNewName(e.target.value)}
+                                            className="form-control"
+                                        />
+                                        <button
+                                            onClick={handleNameChange}
+                                            className="btn btn-primary"
+                                            disabled={!newName.trim()}
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {/* Change Password */}
                                 <form onSubmit={handleSubmit}>
-                                    <h4 className="fw-semibold mb-3">Change Your Password</h4>
+                                    <h4 className="fw-semibold">Change Your Password</h4>
                                     <div className="mb-3">
                                         <input
                                             type="password"
@@ -196,39 +212,59 @@ const Profile = () => {
                                             required
                                         />
                                     </div>
-    
+
                                     {/* Feedback Messages */}
                                     {errorMessage && <p className="text-danger">{errorMessage}</p>}
                                     {successMessage && <p className="text-success">{successMessage}</p>}
-    
-                                    <button type="submit" className="btn btn-primary w-45" disabled={loading}>
+
+                                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                                         {loading ? 'Updating...' : 'Update Password'}
                                     </button>
                                 </form>
-    
+
                                 {/* Alert Message */}
                                 {message.text && (
-                                    <div className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-danger'} mt-4`} role="alert">
+                                    <div className={`alert mt-4 ${message.type === 'success' ? 'alert-success' : 'alert-danger'}`} role="alert">
                                         {message.text}
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* List of Friends */}
+                        <div className="col-lg-4">
+                            <div className="card border-0 shadow-sm p-4">
+                                <h3 className="fw-semibold mb-3">List of Friends</h3>
+                                <ul className="list-group">
+                                    List
+                                    {/* {friendsList.length > 0 ? (
+                                        friendsList.map((friend, index) => (
+                                            <li key={index} className="list-group-item">
+                                                {friend.name}
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <p className="text-muted">No friends added yet.</p>
+                                    )} */}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </section>
-    
+
+
                 {/* Toggle Fetch User */}
                 <div className="text-center mt-4">
                     <button onClick={() => setShowFetchUser(!showFetchUser)} className="btn btn-info">
                         {showFetchUser ? 'Hide User Lookup' : 'Show User Lookup'}
                     </button>
                 </div>
-    
+
                 {showFetchUser && <FetchUserById />}
             </div>
         </div>
     );
-    
+
 };
 
 export default Profile;

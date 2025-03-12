@@ -23,7 +23,6 @@ const HomePage = () => (
     </header>
 
     {/* Hero Section */}
-    {/* Hero Section */}
     <section id="toff" className="position-relative text-center text-white">
       <div className="background-overlay d-flex align-items-center justify-content-center" style={{ height: "100vh" }}>
         <div>
