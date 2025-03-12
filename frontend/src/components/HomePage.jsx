@@ -2,6 +2,7 @@ import React from 'react';
 import { akram_picture, game, hama_picture, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
+import { Link } from 'react-router-dom';
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
@@ -30,7 +31,9 @@ const HomePage = () => (
           <p className="lead mt-3">
             Experience the next generation of Pong with real-time multiplayer and competitive leaderboards.
           </p>
-          <button className="btn btn-primary btn-lg mt-3">Start Playing</button>
+          <Link to="/game">
+            <button className="btn btn-primary btn-lg mt-3">Start Playing</button>
+          </Link>
         </div>
       </div>
     </section>
@@ -48,7 +51,9 @@ const HomePage = () => (
               ft_transcendence game is a modern interpretation of the classic Pong game, featuring real-time multiplayer functionality, customizable paddles, and competitive leaderboards.
             </p>
             <div className="d-flex gap-3">
-              <button className="btn btn-primary">Play Now</button>
+              <Link to="/game">
+                <button className="btn btn-primary">Play Now</button>
+              </Link>
             </div>
           </div>
         </div>
