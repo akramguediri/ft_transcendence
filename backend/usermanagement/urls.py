@@ -20,5 +20,6 @@ urlpatterns = [
     path('unblockuser', views.unblock_user, name='unblock_user'),
     path('fetchblockedusers', views.fetch_blocked_users, name='fetch_blocked_users'),
     path('get42token', views.getToken, name='get_42_token'),
+    path('get42UserInfo', views.getUserInfo, name='Get42UserInfo'),
 ]
 
