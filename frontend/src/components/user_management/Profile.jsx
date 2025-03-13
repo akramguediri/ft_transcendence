@@ -92,6 +92,39 @@ const Profile = () => {
         }
     };
 
+    // Function to fetch 42 API user info
+    const fetch42UserInfo = async () => {
+        const userToken = JSON.parse(localStorage.getItem('user'));
+        console.log("user token", userToken)
+        // if (!userToken || !userToken.access_token) {
+        //     console.error("No access token found.");
+        //     return;
+        // }
+
+        // const accessToken = userToken.access_token;
+        const accessToken = userToken;
+        console.log("access token", accessToken)
+
+        try {
+            const response = await fetch('https://api.intra.42.fr/v2/me', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("42 API User Data:", data);
+
+                // Update Profile state
+                setUserName(data.login); // Use the 42 username
+                setUserAvatar(data.image.link); // Set 42 profile picture
+            }
+        } catch (err) {
+            console.error("Error fetching 42 user data:", err);
+        }
+    };
+
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         console.log("user :", user);
@@ -101,6 +134,8 @@ const Profile = () => {
             setUserAvatar(avatarUrl);
             console.log("avatar icon: ", avatarUrl);
         }
+        // Fetch user info from 42 API if logged in with 42
+        fetch42UserInfo();
     }, []);
 
     const handleSubmit = async (e) => {
@@ -263,7 +298,7 @@ const Profile = () => {
                                 <div className="card-body text-white">
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <div >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trophy" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
                                                 <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z" />
                                             </svg>
                                             <h5 className="card-title">3 Wins</h5>

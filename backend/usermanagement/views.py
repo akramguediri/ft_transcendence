@@ -2,15 +2,133 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
-import json
+import json, os , requests
 from .models import MyUser
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
+from dotenv import load_dotenv
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
+
+load_dotenv()
+
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+HTTP_METHOD = os.getenv('HTTP_METHOD', 'http')
+HOST_NAME = os.getenv('HOST_NAME', '127.0.0.1')
+REACT_PORT = os.getenv('REACT_PORT', '3000')
+
+# Construct the REDIRECTION_URL dynamically
+REDIRECTION_URL = f"{HTTP_METHOD}://{HOST_NAME}:{REACT_PORT}/home-page"
+
+
+
+@csrf_exempt
+def getToken(request):
+    try:
+        # Parse the request body
+        code_data = json.loads(request.body.decode("utf-8"))
+        code = code_data.get('code')
+        if not code:
+            return JsonResponse({'error': 'Missing "code" parameter'}, status=400)
+
+        # Prepare the request to the 42 API
+        url = 'https://api.intra.42.fr/oauth/token'
+        data = {
+            'grant_type': 'authorization_code',
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': REDIRECTION_URL
+        }
+
+        # Make the request to the 42 API
+        response = requests.post(url, data=data)
+        token_data = response.json()
+
+        # Return the token data
+        return JsonResponse(token_data)
+
+    except Exception as e:
+        return JsonResponse({'error': 'An error occurred while processing the request'}, status=500)
+
+
+@csrf_exempt
+def getUserInfo(request):
+
+    try:
+        
+        # Parse the request body to get the access token 
+        token = json.loads(request.body.decode("utf-8"))
+        
+        if not token.get('access_token'):
+            return JsonResponse({'error': 'Missing "access_token" parameter'}, status=400)
+
+        # Fetch user info from the 42 API
+        url = 'https://api.intra.42.fr/v2/me'
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+        response = requests.get(url, headers=headers)
+        user_data = response.json()
+
+        # Check if the API returned an error
+        if 'error' in user_data:
+            return JsonResponse({'error': user_data['error_description']}, status=400)
+
+        # Create or fetch the user from your database
+        user = get_or_create_user(user_data, token["access_token"])
+        if not user:
+            return JsonResponse({'error': 'User already exists or could not be created'}, status=400)
+
+        # Serialize the user data
+        serialized_user_data = serialize_user(user)
+
+        # Return the user data
+        return JsonResponse(serialized_user_data, safe=False)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except requests.RequestException as e:
+        return JsonResponse({'error': f'Failed to communicate with 42 API: {str(e)}'}, status=500)
+
+def get_or_create_user(user_data, access_token):
+    # Extract relevant user data from the 42 API response
+    email = user_data.get('email')
+    login = user_data.get('login')
+    first_name = user_data.get('first_name')
+    last_name = user_data.get('last_name')
+
+    # Get the custom user model
+    User = get_user_model()
+
+    # Create or update the user
+    user, created = User.objects.get_or_create(
+        user_name=login,
+        defaults={
+            'name': f"{first_name} {last_name}",
+            'email': email,
+            'access_token': access_token  # Store the access token
+        }
+    )
+
+    if not created:
+        # Update the user's access token if they already exist
+        user.access_token = access_token
+        user.save()
+
+    return user
+
+def serialize_user(user):
+    return {
+        'user_name': user.user_name,
+        'name': user.name,
+        'email': user.email,
+        'description': user.description,
+        'avatar': user.avatar.url if user.avatar else None,
+    }
 
 
 @csrf_exempt
@@ -35,7 +153,7 @@ def update_avatar(request):
         request.user.save()
 
         # Return the new avatar URL
-        avatar_url = request.user.avatar.url  # This should give you the correct URL
+        avatar_url = request.user.avatar.url
 
         return JsonResponse({
             'status': 'success',
