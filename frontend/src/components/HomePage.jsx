@@ -3,7 +3,7 @@ import { akram_picture, game, hama_picture, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 import { Link } from 'react-router-dom';
-import Get42Token from './42API/Get42Api';
+import Get42Token from './42API/Get42Token';
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
