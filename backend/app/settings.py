@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-1789%o+89i8&i=-^kv8e99eiygxqq!7xtte8d_jb&ktimf2#57
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1',
+    '*',
 ]
 
 # Application definition
@@ -142,10 +142,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
+    'http://10.13.8.3:3000',
+    "http://10.13.8.*:3000",
+    'https://api.intra.42.fr',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
+    "http://10.13.8.3:3000",
+    "http://10.13.8.*:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = True

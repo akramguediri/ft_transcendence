@@ -1,7 +1,7 @@
 import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
-
+import API_URL from './config.js';
 async function fetchUsers() {
-	const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchUsers', {
+	const response = await fetch(`${API_URL}/usermanagement/fetchUsers`, {
 		method: 'GET',
 		headers: {
 			'X-CSRFToken': getCSRFTokenFromCookies(),
