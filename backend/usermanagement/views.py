@@ -83,7 +83,7 @@ def loginUser(request):
         login(request, user)
 
         # Get the avatar URL if it exists, otherwise use a default
-        avatar_url = user.avatar.url if user.avatar else '/media/avatar/default-avatar.png'
+        avatar_url = user.avatar.url if user.avatar else '/media/Avatars/default-avatar.png'
 
         return JsonResponse({
             'status': 'success',
