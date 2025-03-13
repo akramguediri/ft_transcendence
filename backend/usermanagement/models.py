@@ -18,6 +18,8 @@ class MyUser(AbstractBaseUser):
     name = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='Avatars/', blank=True, null=True, default='Avatars/default-avatar.png')
+    email = models.EmailField(unique=True, blank=True, null=True) 
+    access_token = models.CharField(max_length=255, blank=True, null=True)
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'user_name'
