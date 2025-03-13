@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
-
+import API_URL from '../config.js';
 const LoginUser = () => {
     const [user_name, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -28,7 +28,7 @@ const LoginUser = () => {
                 user_name,
                 password,
             };
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/login', {
+            const response = await fetch(`${API_URL}/usermanagement/login`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
