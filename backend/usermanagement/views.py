@@ -19,7 +19,7 @@ load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 HTTP_METHOD = os.getenv('HTTP_METHOD', 'http')
-HOST_NAME = os.getenv('HOST_NAME', '127.0.0.1')
+HOST_NAME = os.getenv('HOST_NAME', '10.13.8.3')
 REACT_PORT = os.getenv('REACT_PORT', '3000')
 
 # Construct the REDIRECTION_URL dynamically

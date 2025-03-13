@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
 import GetCSRFToken from '../getCSRFToken';
-
+import API_URL from '../config.js';
 
 const UserRegistry = () => {
     const [user_name, setUserName] = useState('');
@@ -57,7 +57,7 @@ const UserRegistry = () => {
                 name: name || null,
             };
             const csrfToken = getCSRFTokenFromCookies(); // Get the CSRF token from cookies
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/register', {
+            const response = await fetch(`${API_URL}/usermanagement/register`, {
                 method: 'POST',
                 credentials: 'include',
                 body: JSON.stringify(data),

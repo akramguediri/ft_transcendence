@@ -1,7 +1,7 @@
 import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
-
+import API_URL from './config.js';
 async function UpdateName({name, new_name}) {
-	const response = await fetch('http://127.0.0.1:8000/usermanagement/updateName', {
+	const response = await fetch(`${API_URL}/usermanagement/updateName`, {
 		method: 'POST',
 		credentials: 'include',
 		body: JSON.stringify({
