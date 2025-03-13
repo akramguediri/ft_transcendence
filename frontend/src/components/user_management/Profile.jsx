@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { updatePassword } from '../updatePassword';
 import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
 import FetchUserById from './FetchUserById';
+import API_URL from '../config.js';
 
 const Profile = () => {
     const [oldPassword, setOldPassword] = useState('');
@@ -60,7 +61,7 @@ const Profile = () => {
         formData.append('avatar', avatarFile);
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/updateAvatar', {
+            const response = await fetch(`${API_URL}/usermanagement/updateAvatar`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -74,7 +75,7 @@ const Profile = () => {
 
 
             if (response.ok) {
-                const newAvatarUrl = `http://127.0.0.1:8000${data.avatar_url}`;
+                const newAvatarUrl = `${API_URL}${data.avatar_url}`;
                 setUserAvatar(newAvatarUrl);
 
                 const user = JSON.parse(localStorage.getItem('user'));

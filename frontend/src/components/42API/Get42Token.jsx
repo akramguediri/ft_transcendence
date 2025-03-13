@@ -1,9 +1,9 @@
 import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
-
+import API_URL from '../config.js';
 const Get42UserInfo = async (accessToken) => {
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/usermanagement/get42UserInfo', {
+        const response = await fetch(`${API_URL}/usermanagement/get42UserInfo`, {
             method: 'POST',
             body: JSON.stringify({ access_token: accessToken }),
             headers: {

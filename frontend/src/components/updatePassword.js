@@ -1,5 +1,5 @@
 import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
-
+import API_URL from './config.js';
 export const updatePassword = async (oldPassword, newPassword, newPasswordConfirm) => {
     const requestData = {
         old_pwd: oldPassword,
@@ -8,7 +8,7 @@ export const updatePassword = async (oldPassword, newPassword, newPasswordConfir
     };
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/usermanagement/updatePassword', {
+        const response = await fetch(`${API_URL}/usermanagement/updatePassword`, {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify(requestData),

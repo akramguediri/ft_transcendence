@@ -1,8 +1,8 @@
 import getCSRFTokenFromCookies from '../token/GetTokenFromCookies';
-
+import API_URL from '../config.js';
 const Get42Token = async (code) => {
     try {
-        const response = await fetch('http://127.0.0.1:8000/usermanagement/get42token', {
+        const response = await fetch(`${API_URL}usermanagement/get42token`, {
             method: 'POST',
             body: JSON.stringify({ code }),
             headers: {

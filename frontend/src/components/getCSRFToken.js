@@ -1,5 +1,7 @@
+import API_URL from './config.js';
+
 async function GetCSRFToken() {
-    const response = await fetch(`http://127.0.0.1:8000/usermanagement/csrf`, {
+    const response = await fetch(`${API_URL}/usermanagement/csrf`, {
         method: 'GET',
         credentials: 'include', // Important for sending/receiving cookies
     });

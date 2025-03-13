@@ -1,7 +1,8 @@
 import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
+import API_URL from './config.js';
 
 async function logoutUser() {
-    const response = await fetch('http://127.0.0.1:8000/usermanagement/logout', {
+    const response = await fetch(`${API_URL}/usermanagement/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: {
