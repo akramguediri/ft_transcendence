@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { akram_picture, game, hama_picture, milad_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 import { Link } from 'react-router-dom';
+import Get42Token from './42API/Get42Api';
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
@@ -16,7 +17,18 @@ const TeamCard = ({ image, name, description }) => (
   </div>
 );
 
-const HomePage = () => (
+const HomePage = () => {
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    console.log("code token: ", code);
+
+    if (code) {
+        Get42Token(code)
+    }
+}, []);
+  return (
   <>
     {/* Navbar */}
     <header className="py-4">
@@ -90,6 +102,7 @@ const HomePage = () => (
       </div>
     </section>
   </>
-);
+)
+};
 
 export default HomePage;
