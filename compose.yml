@@ -12,6 +12,11 @@ services:
       - ./debug/frontend/:/debug
     environment:
       - GID=$USER_GID
+      - HTTP_METHOD=${HTTP_METHOD}
+      - HOST_NAME=${HOST_NAME}
+      - REACT_APP_CLIENT_ID=${CLIENT_ID}
+      - REACT_APP_PORT=${REACT_PORT}
+      - REACT_APP_REDIRECT_URI=${REDIRECT_URI}
   backend:
     build: 
       dockerfile: backend/Dockerfile
@@ -24,11 +29,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       - GID=$USER_GID
       - DJANGO_SUPERUSER_PASSWORD=$DJANGO_PASS
       - DJANGO_SUPERUSER_EMAIL=$DJANGO_EMAIL
       - DJANGO_SUPERUSER_USERNAME=$DJANGO_USERNAME
+      - CLIENT_ID=${CLIENT_ID}
+      - REACT_PORT=${REACT_PORT}
+      - HOST_NAME=${HOST_NAME}
+      - HTTP_METHOD=${HTTP_METHOD}
   db:
     build: 
       dockerfile: db/Dockerfile
