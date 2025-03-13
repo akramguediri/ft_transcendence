@@ -8,34 +8,54 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .models import MyUser, Friend
+from dotenv import load_dotenv
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
 
-CLIENT_ID = os.environ.get('CLIENT_ID')
-CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
-REACT_PORT = os.environ.get('REACT_PORT')
-HOST_NAME = os.environ.get('HOST_NAME')
-HTTP_METHOD = os.environ.get('HTTP_METHOD')
-REDIRECTION_URL = f"{HTTP_METHOD}://{HOST_NAME}:{REACT_PORT}/home-page"
-# REDIRECTION_URL = HTTP_METHOD + '://' + HOST_NAME + ':' + REACT_PORT 
+load_dotenv()
 
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+HTTP_METHOD = os.getenv('HTTP_METHOD', 'http')
+HOST_NAME = os.getenv('HOST_NAME', '127.0.0.1')
+REACT_PORT = os.getenv('REACT_PORT', '3000')
+
+# Construct the REDIRECTION_URL dynamically
+REDIRECTION_URL = f"{HTTP_METHOD}://{HOST_NAME}:{REACT_PORT}/home-page"
+
+
+
+@csrf_exempt
 def getToken(request):
     try:
+        # Log the incoming request body
+        print("Incoming request body:", request.body.decode("utf-8"))
+
+        print("CLIENT_ID:", CLIENT_ID) 
+        print("CLIENT_SECRET:", CLIENT_SECRET)
+        print("HOST_NAME:", HOST_NAME)
+        print("REDIRECTION_URL:", REDIRECTION_URL)
+
         # Parse the request body
-        code = json.loads(request.body.decode("utf-8"))
-        if not code.get('code'):
+        code_data = json.loads(request.body.decode("utf-8"))
+        code = code_data.get('code')
+
+        # Log the extracted code
+        print("Extracted code:", code)
+
+        if not code:
             return JsonResponse({'error': 'Missing "code" parameter'}, status=400)
 
         # Prepare the request to the 42 API
         url = 'https://api.intra.42.fr/oauth/token'
         data = {
             'grant_type': 'authorization_code',
-            'client_id': os.environ.get('CLIENT_ID'),  # Use environment variables
-            'client_secret': os.environ.get('CLIENT_SECRET'),
-            'code': code['code'],
-            'redirect_uri': os.environ.get('REDIRECT_URL')
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': REDIRECTION_URL
         }
 
         # Log the data being sent to the 42 API
