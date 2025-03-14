@@ -99,3 +99,35 @@ def updateName(request):
             'msg': 'An error occurred.',
             'err': [str(e)]
         }, status=500)
+
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
+import json
+from .models import GameRecord
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SaveGameRecord(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            game_record = GameRecord(
+                game_id=data.get('gameId'),
+                player1=data.get('player1'),
+                player2=data.get('player2'),
+                result=data.get('result'),
+                winner=data.get('winner'),
+                loser=data.get('loser'),
+                game_mode=data.get('gameMode'),
+                ball_size=data['settings']['ballSize'],
+                paddle_speed=data['settings']['paddleSpeed'],
+                max_score=data['settings']['maxScore'],
+                game_duration=data['settings']['gameDuration'],
+            )
+            game_record.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Game record saved successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
