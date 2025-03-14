@@ -19,8 +19,131 @@ const Profile = () => {
     const [avatarFile, setAvatarFile] = useState(null);
     const [showFetchUser, setShowFetchUser] = useState(false);
     const [activeTab, setActiveTab] = useState("status");
+    const [friends, setFriends] = useState([]);
+    const [friendRequests, setFriendRequests] = useState([]);
 
     const navigate = useNavigate();
+
+    // function for fetch Friend Requests
+    const fetchFriendRequests = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchfriendrequests', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch friend requests');
+            }
+    
+            const data = await response.json();
+            setFriendRequests(data.data.requests);
+        } catch (error) {
+            console.error('Error fetching friend requests:', error);
+        }
+    };
+
+
+    // function to accept requests from friend
+
+    const acceptRequest = async (requestId) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/acceptfriendrequest', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ request_id: requestId }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to accept request');
+            }
+    
+            const data = await response.json();
+            alert('Friend request accepted');
+            fetchFriendRequests(); // Refresh the list
+        } catch (error) {
+            console.error('Error accepting friend request:', error);
+        }
+    };
+
+    // const acceptRequest = async (requestId) => {
+    //     try {
+    //         const response = await fetch('http://127.0.0.1:8000/usermanagement/acceptfriendrequest', {
+    //             method: 'POST',
+    //             credentials: 'include',
+    //             headers: {
+    //                 'X-CSRFToken': getCSRFTokenFromCookies(),
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({ request_id: requestId }),
+    //         });
+    
+    //         if (!response.ok) {
+    //             throw new Error('Failed to accept request');
+    //         }
+    
+    //         const data = await response.json();
+    //         alert('Friend request accepted');
+    //         fetchFriendRequests(); // Refresh the list
+    //     } catch (error) {
+    //         console.error('Error accepting friend request:', error);
+    //     }
+    // };
+    
+    // function to reject requests from friend
+    const rejectRequest = async (requestId) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/rejectFriendRequest', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ request_id: requestId }),
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                alert('Friend request rejected');
+                fetchFriendRequests(); // Refresh the list
+            } else {
+                alert(data.msg || 'Failed to reject request');
+            }
+        } catch (error) {
+            alert('An unexpected error occurred');
+        }
+    };
+
+
+    // function for fetch user friends
+    const fetchFriends = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchuserfriends', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': getCSRFTokenFromCookies(),
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch friends');
+            }
+    
+            const data = await response.json();
+            setFriends(data.data.friends);
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+        }
+    };
+    
 
     const handleNameChange = async () => {
         if (!newName.trim()) {
@@ -92,50 +215,16 @@ const Profile = () => {
         }
     };
 
-    // Function to fetch 42 API user info
-    const fetch42UserInfo = async () => {
-        const userToken = JSON.parse(localStorage.getItem('user'));
-        console.log("user token", userToken)
-        // if (!userToken || !userToken.access_token) {
-        //     console.error("No access token found.");
-        //     return;
-        // }
-
-        // const accessToken = userToken.access_token;
-        const accessToken = userToken;
-        console.log("access token", accessToken)
-
-        try {
-            const response = await fetch('https://api.intra.42.fr/v2/me', {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("42 API User Data:", data);
-
-                // Update Profile state
-                setUserName(data.login); // Use the 42 username
-                setUserAvatar(data.image.link); // Set 42 profile picture
-            }
-        } catch (err) {
-            console.error("Error fetching 42 user data:", err);
-        }
-    };
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
-        console.log("user :", user);
         if (user) {
             setUserName(user.name);
             const avatarUrl = user.avatar ? `http://127.0.0.1:8000${user.avatar}` : 'http://127.0.0.1:8000/media/Avatars/default-avatar.png';
             setUserAvatar(avatarUrl);
-            console.log("avatar icon: ", avatarUrl);
         }
-        // Fetch user info from 42 API if logged in with 42
-        fetch42UserInfo();
+        fetchFriends();
+        fetchFriendRequests();
     }, []);
 
     const handleSubmit = async (e) => {
@@ -225,10 +314,56 @@ const Profile = () => {
                                     {activeTab === "status" ? (
                                         <h5 className="card-title">Online</h5>
                                     ) : activeTab === "friends" ? (
-                                        <div className="mb-4 text-center">
-                                            <h3 className="fw-semibold">Number of Friends</h3>
-                                            <p className="fs-4 text-primary">1</p>
+                                        <div className="text-center text-secondary">
+                                        <h3 className="fw-semibold mb-3 text-secondary">Friend List</h3>
+                                        <div className="table-responsive">
+                                            <table className="table table-striped table-bordered align-middle">
+                                                <thead className="table-dark">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Description</th>
+                                                        <th scope="col">Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {friends.map((friend, index) => (
+                                                        <tr key={friend.id}>
+                                                            <th scope="row">{index + 1}</th>
+                                                            <td>{friend.name}</td>
+                                                            <td>{friend.description || 'No description'}</td>
+                                                            <td>{/* Add logic to display online status */}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
                                         </div>
+                                        <div className="table-responsive mt-5 text-secondary">
+                                            <h3 className="fw-semibold mb-3 text-secondary">Friend Requests</h3>
+                                            <table className="table table-striped table-bordered align-middle">
+                                                <thead className="table-dark">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {friendRequests.map((request, index) => (
+                                                        <tr key={request.id}>
+                                                            <th scope="row">{index + 1}</th>
+                                                            <td>{request.name}</td>
+                                                            <td>
+                                                                <button onClick={() => acceptRequest(request.id)} className="btn btn-success btn-sm me-2">Accept</button>
+                                                                <button onClick={() => rejectRequest(request.id)} className="btn btn-danger btn-sm">Reject</button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
                                     ) : activeTab === "modify" ? (
                                         <div className="input-group">
                                             <input
