@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import addFriend from './AddFriend';
-
+import API_URL from '../../config.js';
 const InvitationFriends = () => {
     const [users, setUsers] = useState([]);
 
@@ -8,7 +8,7 @@ const InvitationFriends = () => {
         // Fetch users from your backend
         const fetchUsers = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchUsers');
+                const response = await fetch(`${API_URL}/usermanagement/fetchUsers`);
                 const data = await response.json();
                 setUsers(data);
             } catch (error) {
