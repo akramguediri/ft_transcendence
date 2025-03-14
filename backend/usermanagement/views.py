@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import MyUser, Friend
+from .models import MyUser, Friend, Notification
 from dotenv import load_dotenv
 
 def csrf(request):
@@ -82,7 +82,8 @@ def getUserInfo(request):
         user = get_or_create_user(user_data, token["access_token"])
         if not user:
             return JsonResponse({'error': 'User already exists or could not be created'}, status=400)
-
+          # Log the user in
+        login(request, user)
         # Serialize the user data
         serialized_user_data = serialize_user(user)
 
@@ -400,34 +401,6 @@ def updateDescription(request):
 
 
 @login_required
-def fetch_user_friends(request):
-    if request.method != "GET":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        friends = Friend.objects.filter(user=user, is_blocked=False)
-        friend_list = [
-            {
-                'id': friend.friend.id,
-                'name': friend.friend.name,
-                'description': friend.friend.description,
-                'avatar': friend.friend.avatar,
-            }
-            for friend in friends
-        ]
-
-        return JsonResponse({
-            'status': 'success',
-            'data': {
-                'friends': friend_list
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-
-@login_required
 def is_blocked(request):
     if request.method != "POST":
         return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
@@ -461,13 +434,13 @@ def fetch_user_friends(request):
 
     try:
         user = request.user
-        friends = Friend.objects
+        friends = Friend.objects.filter(user=user, is_blocked=False, status='accepted')
         friend_list = [
             {
                 'id': friend.friend.id,
                 'name': friend.friend.name,
                 'description': friend.friend.description,
-                'avatar': friend.friend.avatar,
+                'avatar': friend.friend.avatar.url if friend.friend.avatar else None,
             }
             for friend in friends
         ]
@@ -482,6 +455,7 @@ def fetch_user_friends(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
     
+
 @login_required
 def add_friend(request):
     if request.method != "POST":
@@ -503,11 +477,12 @@ def add_friend(request):
         if existing_friendship:
             return JsonResponse({'status': 'error', 'msg': 'Already friends'}, status=400)
 
-        Friend.objects.create(user=user, friend=friend_user, is_blocked=False)
+        Friend.objects.create(user=user, friend=friend_user, is_blocked=False, status='pending')
+        Notification.objects.create(user=friend_user, message=f"{user.name} sent you a friend request.")
 
         return JsonResponse({
             'status': 'success',
-            'msg': 'Friend added successfully',
+            'msg': 'Friend request sent successfully',
             'data': {
                 'user_id': user_id
             }
@@ -515,6 +490,89 @@ def add_friend(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@login_required
+def accept_friend_request(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+
+        if not request_id:
+            return JsonResponse({'status': 'error', 'msg': 'Request ID not provided'}, status=400)
+
+        # Debugging: Print the request_id and user
+        print(f"Request ID: {request_id}, User: {user}")
+
+        # Check the friend request
+        friendship = Friend.objects.filter(id=request_id, friend=user, status='pending').first()
+        if not friendship:
+            print(f"No pending request found for User: {user} with Request ID: {request_id}")
+            return JsonResponse({'status': 'error', 'msg': 'Friend request not found'}, status=404)
+
+        friendship.status = 'accepted'
+        friendship.save()
+        
+        return JsonResponse({'status': 'success', 'msg': 'Friend request accepted'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+    
+@login_required
+def fetch_friend_requests(request):
+    if request.method != "GET":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        requests = Friend.objects.filter(friend=user, status='pending')
+        request_list = [
+            {
+                'id': request.user.id,
+                'name': request.user.name,
+                'description': request.user.description,
+                'avatar': request.user.avatar.url if request.user.avatar else None,
+            }
+            for request in requests
+        ]
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'requests': request_list
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@login_required
+def reject_friend_request(request):
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
+
+    try:
+        user = request.user
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+
+        if not request_id:
+            return JsonResponse({'status': 'error', 'msg': 'Request ID not provided'}, status=400)
+
+        friendship = Friend.objects.filter(id=request_id, friend=user, status='pending').first()
+        if not friendship:
+            return JsonResponse({'status': 'error', 'msg': 'Friend request not found'}, status=404)
+
+        friendship.delete()
+
+        return JsonResponse({'status': 'success', 'msg': 'Friend request rejected'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
 
 @login_required
 def remove_friend(request):
