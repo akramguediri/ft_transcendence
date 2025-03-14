@@ -2,7 +2,8 @@
 services:
   frontend:
     build: 
-      dockerfile: frontend/Dockerfile
+      context: frontend
+      dockerfile: Dockerfile
       target: $STAGE
     container_name: frontend
     ports:
@@ -19,7 +20,8 @@ services:
       - REACT_APP_REDIRECT_URI=${REDIRECT_URI}
   backend:
     build: 
-      dockerfile: backend/Dockerfile
+      context: backend
+      dockerfile: Dockerfile
       target: $STAGE
     container_name: backend
     ports:
@@ -42,7 +44,8 @@ services:
       - HTTP_METHOD=${HTTP_METHOD}
   db:
     build: 
-      dockerfile: db/Dockerfile
+      context: db
+      dockerfile: Dockerfile
     container_name: db
     environment:
       - POSTGRES_USER=$DB_USER
