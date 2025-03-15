@@ -1,3 +1,4 @@
+import API_URL from "../../config";
 import getCSRFTokenFromCookies from "../../token/GetTokenFromCookies";
 import API_URL from '../../config.js';
 const addFriend = async (userId) => {
