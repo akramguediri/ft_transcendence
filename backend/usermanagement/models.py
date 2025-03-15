@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
@@ -45,3 +46,21 @@ class Notification(models.Model):
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class GameRecord(models.Model):
+    game_id = models.CharField(max_length=100, unique=True)
+    player1 = models.CharField(max_length=100)
+    player2 = models.CharField(max_length=100)
+    result = models.CharField(max_length=10)
+    winner = models.CharField(max_length=100)
+    loser = models.CharField(max_length=100)
+    game_mode = models.CharField(max_length=50)
+    ball_size = models.IntegerField()
+    paddle_speed = models.IntegerField()
+    max_score = models.IntegerField()
+    game_duration = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Game {self.game_id} - {self.result}"
