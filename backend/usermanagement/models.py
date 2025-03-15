@@ -33,12 +33,19 @@ class Friend(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='friends')
     friend = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='friend_of')
     is_blocked = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted')], default='pending')
 
     class Meta:
         unique_together = ('user', 'friend')
 
     def __str__(self):
         return f"{self.user.user_name} -> {self.friend.user_name} (Blocked: {self.is_blocked})"
+    
+class Notification(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class GameRecord(models.Model):

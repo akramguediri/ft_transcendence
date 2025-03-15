@@ -22,4 +22,7 @@ urlpatterns = [
     path('get42token', views.getToken, name='get_42_token'),
     path('get42UserInfo', views.getUserInfo, name='Get42UserInfo'),
     path('gameRecords', views.save_game_record, name='save_game_record'),
+    path('acceptfriendrequest', views.accept_friend_request, name='acceptfriendrequest'),
+    path('rejectFriendRequest', views.reject_friend_request, name='reject_friend_request'),
+    path('fetchfriendrequests', views.fetch_friend_requests, name='fetch_friend_requests'),
 ]
