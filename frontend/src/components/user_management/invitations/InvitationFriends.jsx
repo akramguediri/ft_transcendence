@@ -10,6 +10,7 @@ const InvitationFriends = () => {
             try {
                 const response = await fetch(`${API_URL}/usermanagement/fetchUsers`);
                 const data = await response.json();
+                console.log("Invitation :");
                 setUsers(data);
             } catch (error) {
                 console.error('Error fetching users:', error);
@@ -26,7 +27,7 @@ const InvitationFriends = () => {
     return (
         <div className="container mt-5">
             <h2>Send Friend Invitations</h2>
-            <ul className="list-group">
+            <ul className="list-group text-secondary">
                 {users.map(user => (
                     <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center">
                         {user.name}
