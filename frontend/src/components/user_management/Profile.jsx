@@ -22,13 +22,16 @@ const Profile = () => {
     const [activeTab, setActiveTab] = useState("status");
     const [friends, setFriends] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
+    const [loadingFriends, setLoadingFriends] = useState(false);
+    const [loadingFriendRequests, setLoadingFriendRequests] = useState(false);
 
     const navigate = useNavigate();
 
     // function for fetch Friend Requests
     const fetchFriendRequests = async () => {
+        setLoadingFriendRequests(true);
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchfriendrequests', {
+            const response = await fetch(`${API_URL}/usermanagement/fetchfriendrequests`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -44,6 +47,8 @@ const Profile = () => {
             setFriendRequests(data.data.requests);
         } catch (error) {
             console.error('Error fetching friend requests:', error);
+        } finally {
+            setLoadingFriendRequests(false);
         }
     };
 
@@ -52,7 +57,7 @@ const Profile = () => {
 
     const acceptRequest = async (requestId) => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/acceptfriendrequest', {
+            const response = await fetch(`${API_URL}/usermanagement/acceptfriendrequest`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -85,11 +90,11 @@ const Profile = () => {
     //             },
     //             body: JSON.stringify({ request_id: requestId }),
     //         });
-    
+
     //         if (!response.ok) {
     //             throw new Error('Failed to accept request');
     //         }
-    
+
     //         const data = await response.json();
     //         alert('Friend request accepted');
     //         fetchFriendRequests(); // Refresh the list
@@ -97,11 +102,11 @@ const Profile = () => {
     //         console.error('Error accepting friend request:', error);
     //     }
     // };
-    
+
     // function to reject requests from friend
     const rejectRequest = async (requestId) => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/rejectFriendRequest', {
+            const response = await fetch(`${API_URL}/usermanagement/rejectFriendRequest`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -125,8 +130,9 @@ const Profile = () => {
 
     // function for fetch user friends
     const fetchFriends = async () => {
+        setLoadingFriends(true);
         try {
-            const response = await fetch('http://127.0.0.1:8000/usermanagement/fetchuserfriends', {
+            const response = await fetch(`${API_URL}/usermanagement/fetchuserfriends`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -142,9 +148,12 @@ const Profile = () => {
             setFriends(data.data.friends);
         } catch (error) {
             console.error('Error fetching friends:', error);
+        } finally {
+            setLoadingFriends(false);
         }
     };
     
+
 
     const handleNameChange = async () => {
         if (!newName.trim()) {
@@ -180,6 +189,12 @@ const Profile = () => {
             return;
         }
 
+        // Check if the file is an image
+        if (!avatarFile.type.startsWith('image/')) {
+            setMessage({ text: 'Please upload a valid image file.', type: 'error' });
+            return;
+        }
+
         const formData = new FormData();
         formData.append('avatar', avatarFile);
 
@@ -194,8 +209,6 @@ const Profile = () => {
             });
 
             const data = await response.json();
-
-
 
             if (response.ok) {
                 const newAvatarUrl = `${API_URL}${data.avatar_url}`;
@@ -221,12 +234,12 @@ const Profile = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
             setUserName(user.name);
-            const avatarUrl = user.avatar ? `http://127.0.0.1:8000${user.avatar}` : 'http://127.0.0.1:8000/media/Avatars/default-avatar.png';
+            const avatarUrl = user.avatar ? `${API_URL}${user.avatar}` : `${API_URL}/media/Avatars/default-avatar.png`;
             setUserAvatar(avatarUrl);
         }
         fetchFriends();
         fetchFriendRequests();
-    }, []);
+    }, []); // dependencies
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -304,7 +317,7 @@ const Profile = () => {
                                         <li className="nav-item">
                                             <button
                                                 className={`nav-link ${activeTab === "change password" ? "active" : ""}`}
-                                                onClick={() => setActiveTab("Modify name")}
+                                                onClick={() => setActiveTab("change password")} // Fix the typo here
                                             >
                                                 Change Password
                                             </button>
@@ -316,54 +329,54 @@ const Profile = () => {
                                         <h5 className="card-title">Online</h5>
                                     ) : activeTab === "friends" ? (
                                         <div className="text-center text-secondary">
-                                        <h3 className="fw-semibold mb-3 text-secondary">Friend List</h3>
-                                        <div className="table-responsive">
-                                            <table className="table table-striped table-bordered align-middle">
-                                                <thead className="table-dark">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">Name</th>
-                                                        <th scope="col">Description</th>
-                                                        <th scope="col">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {friends.map((friend, index) => (
-                                                        <tr key={friend.id}>
-                                                            <th scope="row">{index + 1}</th>
-                                                            <td>{friend.name}</td>
-                                                            <td>{friend.description || 'No description'}</td>
-                                                            <td>{/* Add logic to display online status */}</td>
+                                            <h3 className="fw-semibold mb-3 text-secondary">Friend List</h3>
+                                            <div className="table-responsive">
+                                                <table className="table table-striped table-bordered align-middle">
+                                                    <thead className="table-dark">
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Name</th>
+                                                            <th scope="col">Description</th>
+                                                            <th scope="col">Status</th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div className="table-responsive mt-5 text-secondary">
-                                            <h3 className="fw-semibold mb-3 text-secondary">Friend Requests</h3>
-                                            <table className="table table-striped table-bordered align-middle">
-                                                <thead className="table-dark">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">Name</th>
-                                                        <th scope="col">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {friendRequests.map((request, index) => (
-                                                        <tr key={request.id}>
-                                                            <th scope="row">{index + 1}</th>
-                                                            <td>{request.name}</td>
-                                                            <td>
-                                                                <button onClick={() => acceptRequest(request.id)} className="btn btn-success btn-sm me-2">Accept</button>
-                                                                <button onClick={() => rejectRequest(request.id)} className="btn btn-danger btn-sm">Reject</button>
-                                                            </td>
+                                                    </thead>
+                                                    <tbody>
+                                                        {friends.map((friend, index) => (
+                                                            <tr key={friend.id}>
+                                                                <th scope="row">{index + 1}</th>
+                                                                <td>{friend.name}</td>
+                                                                <td>{friend.description || 'No description'}</td>
+                                                                <td>{/* Add logic to display online status */}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div className="table-responsive mt-5 text-secondary">
+                                                <h3 className="fw-semibold mb-3 text-secondary">Friend Requests</h3>
+                                                <table className="table table-striped table-bordered align-middle">
+                                                    <thead className="table-dark">
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Name</th>
+                                                            <th scope="col">Actions</th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        {friendRequests.map((request, index) => (
+                                                            <tr key={request.id}>
+                                                                <th scope="row">{index + 1}</th>
+                                                                <td>{request.name}</td>
+                                                                <td>
+                                                                    <button onClick={() => acceptRequest(request.id)} className="btn btn-success btn-sm me-2">Accept</button>
+                                                                    <button onClick={() => rejectRequest(request.id)} className="btn btn-danger btn-sm">Reject</button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
 
                                     ) : activeTab === "modify" ? (
                                         <div className="input-group">
