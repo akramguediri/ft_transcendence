@@ -8,4 +8,5 @@ urlpatterns = [
     path("getStudent", views.getStudent, name="getStudent"),
     path("updateStudent", views.updateStudent, name="updateStudent"),
     path("updateName", views.updateName, name="updateName"),
+    path('api/game-records/', SaveGameRecord.as_view(), name='save_game_record'),
 ]

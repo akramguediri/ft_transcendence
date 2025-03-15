@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import addFriend from './AddFriend';
-import API_URL from '../../config';
-
+import API_URL from '../../config.js';
 const InvitationFriends = () => {
     const [users, setUsers] = useState([]);
 

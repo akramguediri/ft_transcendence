@@ -1,16 +1,16 @@
 FROM node:current-alpine3.20 AS base
 
 WORKDIR /app/.
-COPY frontend/package.json .
+COPY package.json .
 RUN npm install
 
 FROM base AS development
-COPY frontend/. .
+COPY . .
 RUN chmod +x script.sh
 CMD ["./script.sh"]
 
 FROM base AS build
-COPY frontend/. .
+COPY . .
 RUN ["npm", "run", "build"]
 
 FROM nginx:1.27-alpine3.20-slim AS production
