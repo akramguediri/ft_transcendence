@@ -122,6 +122,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://10.13.8.3:3000',
     'http://10.12.1.4:3000',
+	'http://172.17.246.30:3000',
     'https://api.intra.42.fr',
 ]
 
@@ -129,6 +130,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://10.13.8.3:3000',
     'http://10.12.1.4:3000',
+	'http://172.17.246.30:3000',
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True

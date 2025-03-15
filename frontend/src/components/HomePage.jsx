@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { akram_picture, game, hama_picture, milad_picture } from '../assets';
+import React, { useEffect, useRef, useState } from 'react';
+import { akram_picture, game, hama_picture, mounir_picture } from '../assets';
 import Navbar from './Navbar';
 import styles from '../styles.css';
 import { Link } from 'react-router-dom';
 import Get42Token from './42API/Get42Token';
-import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
+import { Engine, Scene, MeshBuilder, Vector3, HemisphericLight, ArcRotateCamera } from '@babylonjs/core';
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
@@ -18,6 +18,86 @@ const TeamCard = ({ image, name, description }) => (
   </div>
 );
 
+// Babylon.js 3D Ping Pong Ball Component
+const PingPongBall3D = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const engine = new Engine(canvasRef.current, true);
+      const scene = new Scene(engine);
+
+      // Create a camera
+      const camera = new ArcRotateCamera(
+        'camera',
+        Math.PI / 2,
+        Math.PI / 4,
+        10,
+        Vector3.Zero(),
+        scene
+      );
+      camera.attachControl(canvasRef.current, true);
+
+      // Create a light
+      const light = new HemisphericLight('light', new Vector3(1, 1, 0), scene);
+      light.intensity = 0.7;
+
+      // Create a 3D ping pong ball
+      const ball = MeshBuilder.CreateSphere('ball', { diameter: 1 }, scene);
+      ball.position = new Vector3(0, 0, 0);
+
+      // Animation variables
+      let direction = new Vector3(1, 1, 0).normalize();
+      const speed = 0.05;
+
+      // Render loop
+      engine.runRenderLoop(() => {
+        // Update ball position
+        ball.position.addInPlace(direction.scale(speed));
+
+        // Check for collision with boundaries
+        if (ball.position.x > 5 || ball.position.x < -5) {
+          direction.x *= -1;
+        }
+        if (ball.position.y > 5 || ball.position.y < -5) {
+          direction.y *= -1;
+        }
+        if (ball.position.z > 5 || ball.position.z < -5) {
+          direction.z *= -1;
+        }
+
+        // Render the scene
+        scene.render();
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        engine.resize();
+      });
+
+      // Cleanup
+      return () => {
+        engine.dispose();
+      };
+    }
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 1000,
+        pointerEvents: 'none', // Ensure it doesn't block clicks
+      }}
+    />
+  );
+};
+
 const HomePage = () => {
   const [userData, setUserData] = useState(null);
 
@@ -27,10 +107,10 @@ const HomePage = () => {
     if (code) {
       // Call Get42Token to exchange the code for an access token and fetch user info
       Get42Token(code)
-        .then(userData => {
+        .then((userData) => {
           setUserData(userData);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error:', error.message);
           // Handle error (e.g., show an error message to the user)
         });
@@ -39,6 +119,9 @@ const HomePage = () => {
 
   return (
     <>
+      {/* 3D Ping Pong Ball */}
+      <PingPongBall3D />
+
       {/* Navbar */}
       <header className="py-4">
         <Navbar />
@@ -46,11 +129,17 @@ const HomePage = () => {
 
       {/* Hero Section */}
       <section id="toff" className="position-relative text-center text-white">
-        <div className="background-overlay d-flex align-items-center justify-content-center" style={{ height: "100vh" }}>
+        <div
+          className="background-overlay d-flex align-items-center justify-content-center"
+          style={{ height: '100vh' }}
+        >
           <div>
-            <h1 className="display-4 fw-bold">Welcome to <span className="text-primary">ft_transcendence</span></h1>
+            <h1 className="display-4 fw-bold">
+              Welcome to <span className="text-primary">ft_transcendence</span>
+            </h1>
             <p className="lead mt-3">
-              Experience the next generation of Pong with real-time multiplayer and competitive leaderboards.
+              Experience the next generation of Pong with real-time multiplayer and competitive
+              leaderboards.
             </p>
             <Link to="/game">
               <button className="btn btn-primary btn-lg mt-3">Start Playing</button>
@@ -64,7 +153,12 @@ const HomePage = () => {
         <section id="profile" className="py-5 bg-light">
           <div className="container text-center">
             <h2 className="fw-bold mb-3">Welcome, {userData.name}!</h2>
-            <img src={userData.avatar} alt={`${userData.name}'s Avatar`} className="img-fluid rounded-circle mb-3" style={{ width: '150px', height: '150px' }} />
+            <img
+              src={userData.avatar}
+              alt={`${userData.name}'s Avatar`}
+              className="img-fluid rounded-circle mb-3"
+              style={{ width: '150px', height: '150px' }}
+            />
             <p className="lead">Email: {userData.email}</p>
           </div>
         </section>
@@ -75,12 +169,18 @@ const HomePage = () => {
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-6 mb-4 mb-md-0">
-              <img src={game} alt="ft_transcendence game screenshot" className="img-fluid rounded shadow-sm" />
+              <img
+                src={game}
+                alt="ft_transcendence game screenshot"
+                className="img-fluid rounded shadow-sm"
+              />
             </div>
             <div className="col-md-6">
               <h2 className="fw-bold mb-3">Our Game</h2>
               <p className="text-white lead mb-4">
-                ft_transcendence game is a modern interpretation of the classic Pong game, featuring real-time multiplayer functionality, customizable paddles, and competitive leaderboards.
+                ft_transcendence game is a modern interpretation of the classic Pong game,
+                featuring real-time multiplayer functionality, customizable paddles, and competitive
+                leaderboards.
               </p>
               <div className="d-flex gap-3">
                 <Link to="/game">
@@ -106,18 +206,9 @@ const HomePage = () => {
 
           {/* Team Members */}
           <div className="row">
-            <TeamCard
-              image={milad_picture}
-              name="Milad"
-            />
-            <TeamCard
-              image={hama_picture}
-              name="Ihama"
-            />
-            <TeamCard
-              image={akram_picture}
-              name="Akram"
-            />
+            <TeamCard image={mounir_picture} name="Mounir" /> {/* Updated to Mounir */}
+            <TeamCard image={hama_picture} name="Ihama" />
+            <TeamCard image={akram_picture} name="Akram" />
           </div>
         </div>
       </section>
