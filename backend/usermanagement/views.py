@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import MyUser, Friend, Notification
+from .models import MyUser, Friend, GameRecord, Notification
 from dotenv import load_dotenv
 
 def csrf(request):
@@ -495,6 +495,8 @@ def add_friend(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
+
+
 @login_required
 def accept_friend_request(request):
     if request.method != "POST":
@@ -707,3 +709,55 @@ def fetch_blocked_users(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
+
+@csrf_exempt  # Temporarily disable CSRF for testing (remove in production)
+def save_game_record(request):
+    if request.method == 'POST':
+        try:
+            # Parse the JSON data from the request body
+            data = json.loads(request.body)
+
+            # Validate required fields
+            required_fields = ['gameId', 'player1', 'player2', 'result', 'winner', 'loser', 'gameMode', 'settings']
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({'status': 'error', 'message': f'Missing required field: {field}'}, status=400)
+
+            # Validate nested settings fields
+            settings = data.get('settings', {})
+            required_settings = ['ballSize', 'paddleSpeed', 'maxScore', 'gameDuration']
+            for setting in required_settings:
+                if setting not in settings:
+                    return JsonResponse({'status': 'error', 'message': f'Missing required setting: {setting}'}, status=400)
+
+            # Create a new GameRecord instance
+            game_record = GameRecord(
+                game_id=data['gameId'],
+                player1=data['player1'],
+                player2=data['player2'],
+                result=data['result'],
+                winner=data['winner'],
+                loser=data['loser'],
+                game_mode=data['gameMode'],
+                ball_size=settings['ballSize'],
+                paddle_speed=settings['paddleSpeed'],
+                max_score=settings['maxScore'],
+                game_duration=settings['gameDuration'],
+            )
+
+            # Save the game record to the database
+            game_record.save()
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': 'Game record saved successfully'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'status': 'error', 'message': f'Missing key in data: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    else:
+        # Return an error if the request method is not POST
+        return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
