@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { resetBall, moveAIPaddle, checkPaddleCollision } from "./GameHelpers";
 
 export const useGameLogic = (gameMode, keysRef, constants) => {
@@ -25,15 +25,27 @@ export const useGameLogic = (gameMode, keysRef, constants) => {
         }
     }, [gameState.isPaused, gameState.gameOver, timeLeft]);
 
-    // Check for game over conditions
+    // Game over detection
     useEffect(() => {
-        if (timeLeft <= 0 || gameState.score1 >= constants.MAX_SCORE || gameState.score2 >= constants.MAX_SCORE) {
-            setGameState((prevState) => ({
+        // Check if game should be over
+        const shouldBeGameOver = timeLeft <= 0 || 
+                               gameState.score1 >= constants.MAX_SCORE || 
+                               gameState.score2 >= constants.MAX_SCORE;
+        
+        if (shouldBeGameOver && !gameState.gameOver) {
+            // Set game over state
+            setGameState(prevState => ({
                 ...prevState,
-                gameOver: true,
+                gameOver: true
             }));
         }
-    }, [timeLeft, gameState.score1, gameState.score2, constants.MAX_SCORE]);
+    }, [
+        timeLeft, 
+        gameState.score1, 
+        gameState.score2, 
+        gameState.gameOver, 
+        constants.MAX_SCORE
+    ]);
 
     // Handle paddle movement
     const handlePaddleMovement = (newState, gameMode, keysRef, constants) => {

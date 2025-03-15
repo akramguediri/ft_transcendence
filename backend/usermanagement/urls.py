@@ -21,5 +21,5 @@ urlpatterns = [
     path('fetchblockedusers', views.fetch_blocked_users, name='fetch_blocked_users'),
     path('get42token', views.getToken, name='get_42_token'),
     path('get42UserInfo', views.getUserInfo, name='Get42UserInfo'),
+    path('gameRecords', views.save_game_record, name='save_game_record'),
 ]
-
