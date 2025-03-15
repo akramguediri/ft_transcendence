@@ -17,9 +17,9 @@ def csrf(request):
 load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET', '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')
 HTTP_METHOD = os.getenv('HTTP_METHOD', 'http')
-HOST_NAME = os.getenv('HOST_NAME', '10.13.8.3')
+HOST_NAME = os.getenv('HOST_NAME', '127.0.0.1')
 REACT_PORT = os.getenv('REACT_PORT', '3000')
 
 # Construct the REDIRECTION_URL dynamically
@@ -32,6 +32,9 @@ def getToken(request):
     try:
         # Parse the request body
         code_data = json.loads(request.body.decode("utf-8"))
+        print("CLIENT_ID: ", CLIENT_ID)
+        print("CLIENT_SECRET: ", CLIENT_SECRET)
+        print("SEND all the data: ", code_data)
         code = code_data.get('code')
         if not code:
             return JsonResponse({'error': 'Missing "code" parameter'}, status=400)
@@ -64,6 +67,7 @@ def getUserInfo(request):
         
         # Parse the request body to get the access token 
         token = json.loads(request.body.decode("utf-8"))
+
         
         if not token.get('access_token'):
             return JsonResponse({'error': 'Missing "access_token" parameter'}, status=400)
