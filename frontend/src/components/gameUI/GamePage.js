@@ -14,8 +14,11 @@ const GamePage = () => {
     const [gameMode, setGameMode] = useState(null);
     const defaultConstants = getDefaultConstants();
     const [constants, setConstants] = useState(defaultConstants);
-    
-    // Game logic hook
+
+    // Game records hook
+    const { saveGameRecord } = useGameRecords();
+
+    // Initialize useGameLogic without saveGameRecord
     const { gameState, setGameState, updateGameState, timeLeft } = 
         useGameLogic(gameMode, keysRef, constants);
 
@@ -30,9 +33,6 @@ const GamePage = () => {
         hostNetworkGame,
         connectToNetworkGame
     } = useNetwork(socketRef, setGameMode, setGameState);
-
-    // Game records hook
-    const { saveGameRecord } = useGameRecords();
 
     // Canvas rendering
     const canvasRef = useRef(null);
@@ -74,6 +74,19 @@ const GamePage = () => {
         });
     };
 
+    // Function to handle saving the game record
+    const handleSaveGameRecord = () => {
+        const gameId = `game-${Date.now()}`;
+        saveGameRecord(
+            gameState, 
+            constants, 
+            gameMode, 
+            gameId, 
+            gameMode === "ai" ? "Player" : "Player 1", 
+            gameMode === "ai" ? "AI" : "Player 2"
+        );
+    };
+
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">
@@ -97,6 +110,14 @@ const GamePage = () => {
                                 >
                                     {gameState.isPaused ? "Resume" : "Pause"}
                                 </button>
+                                {gameState.gameOver && (
+                                    <button 
+                                        className="btn btn-primary ms-2" 
+                                        onClick={handleSaveGameRecord}
+                                    >
+                                        Save Game Record
+                                    </button>
+                                )}
                             </div>
                             {networkStatus && <p className="text-center mt-3">{networkStatus}</p>}
                             {timeLeft > 0 && <p className="text-center mt-3">Time Left: {timeLeft}s</p>}
