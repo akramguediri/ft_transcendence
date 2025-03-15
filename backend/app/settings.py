@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '10.13.8.3',
     '10.12.1.4',
+    '*',
 ]
 
 # Application definition
