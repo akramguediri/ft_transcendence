@@ -10,7 +10,6 @@ export const useGameRecords = () => {
         }
         // Set player1 to the authenticated user's username
         player1 = userData.user_name;
-
         // Determine the result, winner, and loser
         const result = `${gameState.score1}-${gameState.score2}`;
         const winner = gameState.score1 > gameState.score2 ? player1 : player2;

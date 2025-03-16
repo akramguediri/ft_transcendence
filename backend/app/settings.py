@@ -28,6 +28,7 @@ ALLOWED_HOSTS = [
     '10.13.8.3',
     '10.12.1.4',
     '10.12.1.6',
+    '*',
 ]
 
 # Application definition
@@ -143,4 +144,4 @@ CHANNEL_LAYERS = {
             "hosts": [("127.0.0.1", 6379)],
         },
     },
-}
+
