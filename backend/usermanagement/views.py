@@ -26,7 +26,6 @@ REACT_PORT = os.getenv('REACT_PORT', '3000')
 REDIRECTION_URL = f"{HTTP_METHOD}://{HOST_NAME}:{REACT_PORT}/home-page"
 
 
-
 @csrf_exempt
 def getToken(request):
     try:
@@ -356,6 +355,7 @@ def fetchUserById(request):
     except json.JSONDecodeError:
         return JsonResponse({"msg": "Invalid JSON payload", "status": "error"}, status=400)
 
+
 def updatePassword(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -378,7 +378,8 @@ def updatePassword(request):
         logout(request)
         return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
 
-    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
+    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405) 
+   
 
 def updateDescription(request):
     if request.method != "POST":
@@ -403,33 +404,6 @@ def updateDescription(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
-
-@login_required
-def is_blocked(request):
-    if request.method != "POST":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        data = json.loads(request.body)  # Parse request body
-        user_id = data.get('user_id')
-
-        if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User ID is required'}, status=400)
-
-        # Check if the user_id is in the current user's blocklist
-        is_blocked = Friend.objects.filter(user=user, friend_id=user_id, is_blocked=True).exists()
-
-        return JsonResponse({
-            'status': 'success',
-            'data': {
-                'user_id': user_id,
-                'is_blocked': is_blocked
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 @login_required
 def fetch_user_friends(request):
@@ -580,137 +554,6 @@ def reject_friend_request(request):
         return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
 
 
-@login_required
-def remove_friend(request):
-    if request.method != "POST":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        data = json.loads(request.body)
-        user_id = data.get('user_id')
-
-        if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'user_not_found'}, status=404)
-
-        friendship = Friend.objects.filter(user=user, friend_id=user_id).first()
-        # if not friendship:
-        #     return JsonResponse({'status': 'error', 'msg': 'Friendship not found'}, status=404)
-
-        friendship.delete()
-
-        return JsonResponse({
-            'status': 'success',
-            'msg': 'Friend removed successfully',
-            'data': {
-                'user_id': user_id
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-    
-@login_required
-def block_user(request):
-    if request.method != "POST":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        data = json.loads(request.body)
-        user_id = data.get('user_id')
-
-        if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
-
-        target_user = MyUser.objects.filter(id=user_id).first()
-        if not target_user:
-            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
-
-        blocked_entry = Friend.objects.filter(user=user, friend=target_user, is_blocked=True).first()
-        if blocked_entry:
-            return JsonResponse({'status': 'error', 'msg': 'User is already blocked'}, status=400)
-
-        Friend.objects.filter(user=user, friend=target_user, is_blocked=False).delete()
-
-        Friend.objects.create(user=user, friend=target_user, is_blocked=True)
-
-        return JsonResponse({
-            'status': 'success',
-            'msg': 'User blocked successfully',
-            'data': {
-                'user_id': user_id
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-    
-@login_required
-def unblock_user(request):
-    if request.method != "POST":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-        data = json.loads(request.body)
-        user_id = data.get('user_id')
-
-        if not user_id:
-            return JsonResponse({'status': 'error', 'msg': 'user_not_found'}, status=404)
-
-        target_user = MyUser.objects.filter(id=user_id).first()
-        if not target_user:
-            return JsonResponse({'status': 'error', 'msg': 'User not found'}, status=404)
-
-        friendship = Friend.objects.filter(user=user, friend=target_user, is_blocked=True).first()
-        if not friendship:
-            return JsonResponse({'status': 'error', 'msg': 'User is not in your blocklist'}, status=400)
-
-        friendship.is_blocked = False
-        friendship.save()
-
-        return JsonResponse({
-            'status': 'success',
-            'msg': 'User unblocked successfully',
-            'data': {
-                'user_id': user_id
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-
-@login_required
-def fetch_blocked_users(request):
-    if request.method != "GET":
-        return JsonResponse({'status': 'error', 'msg': 'Invalid method'}, status=405)
-
-    try:
-        user = request.user
-
-        blocked_users = Friend.objects.filter(user=user, is_blocked=True)
-        blocked_users_list = [
-            {
-                'id': blocked.friend.id,
-                'name': blocked.friend.name,
-                'description': blocked.friend.description,
-                'avatar': blocked.friend.avatar,
-            }
-            for blocked in blocked_users
-        ]
-
-        return JsonResponse({
-            'status': 'success',
-            'data': {
-                'blocked_users': blocked_users_list
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'msg': 'An error occurred', 'err': [str(e)]}, status=500)
-
-@csrf_exempt  # Temporarily disable CSRF for testing (remove in production)
 def save_game_record(request):
     if request.method == 'POST':
         try:
@@ -761,3 +604,15 @@ def save_game_record(request):
     else:
         # Return an error if the request method is not POST
         return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
+
+
+def fetch_game_records(request):
+    if request.method == 'GET':
+        try:
+            # Retrieve all game records from the database
+            game_records = GameRecord.objects.all().values()  # Get records as dictionaries
+            return JsonResponse({'status': 'success', 'gameRecords': list(game_records)}, safe=False)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Only GET requests are allowed'}, status=405)
