@@ -4,7 +4,6 @@ import Navbar from './Navbar';
 import styles from '../styles.css';
 import { Link } from 'react-router-dom';
 import Get42Token from './42API/Get42Token';
-import getCSRFTokenFromCookies from './token/GetTokenFromCookies';
 
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
