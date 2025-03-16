@@ -32,6 +32,7 @@ class Friend(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='friends')
     friend = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='friend_of')
     is_blocked = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, default='pending')  # Add this line
 
     class Meta:
         unique_together = ('user', 'friend')

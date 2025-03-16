@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { akram_picture, game, hama_picture, mounir_picture } from '../assets';
+import { akram_picture, game, hama_picture, mounir_picture, } from '../assets'; // Removed milad_picture
 import Navbar from './Navbar';
 import styles from '../styles.css';
 import { Link } from 'react-router-dom';
@@ -86,13 +86,9 @@ const PingPongBall3D = () => {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 1000,
-        pointerEvents: 'none', // Ensure it doesn't block clicks
+        borderRadius: '8px', // Optional: Add rounded corners to match the image style
       }}
     />
   );
@@ -119,9 +115,6 @@ const HomePage = () => {
 
   return (
     <>
-      {/* 3D Ping Pong Ball */}
-      <PingPongBall3D />
-
       {/* Navbar */}
       <header className="py-4">
         <Navbar />
@@ -169,11 +162,10 @@ const HomePage = () => {
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-6 mb-4 mb-md-0">
-              <img
-                src={game}
-                alt="ft_transcendence game screenshot"
-                className="img-fluid rounded shadow-sm"
-              />
+              {/* Replace the game image with the 3D animation canvas */}
+              <div style={{ width: '100%', height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
+                <PingPongBall3D />
+              </div>
             </div>
             <div className="col-md-6">
               <h2 className="fw-bold mb-3">Our Game</h2>
@@ -206,9 +198,9 @@ const HomePage = () => {
 
           {/* Team Members */}
           <div className="row">
-            <TeamCard image={mounir_picture} name="Mounir" /> {/* Updated to Mounir */}
-            <TeamCard image={hama_picture} name="Ihama" />
+            <TeamCard image={hama_picture} name="Hamma" />
             <TeamCard image={akram_picture} name="Akram" />
+            <TeamCard image={mounir_picture} name="Mounir" />
           </div>
         </div>
       </section>

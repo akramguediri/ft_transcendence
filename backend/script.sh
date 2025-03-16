@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Ensure working directory
 cp -R * /debug/.
@@ -11,15 +11,14 @@ fi
 
 # Apply migrations
 python3 manage.py makemigrations
+python3 manage.py makemigrations usermanagement
 python3 manage.py migrate
 
 # Create superuser if env variables exist
 if [ "$DJANGO_SUPERUSER_USERNAME" ] && [ "$DJANGO_SUPERUSER_EMAIL" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    python3 manage.py createsuperuser \
-        --noinput \
-        --username "$DJANGO_SUPERUSER_USERNAME" \
-        --email "$DJANGO_SUPERUSER_EMAIL"
+    echo "Creating superuser..."
+    echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('$DJANGO_SUPERUSER_USERNAME', '$DJANGO_SUPERUSER_EMAIL', '$DJANGO_SUPERUSER_PASSWORD')" | python3 manage.py shell
 fi
 
 # Start Django with Daphne for WebSockets support
-exec daphne -b 0.0.0.0 -p 8000 app.asgi:application
+exec daphne -e ssl:8000:privateKey=/app/private.key:certKey=/app/certificate.crt app.asgi:application
