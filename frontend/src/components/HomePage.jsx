@@ -5,7 +5,6 @@ import styles from '../styles.css';
 import { Link } from 'react-router-dom';
 import Get42Token from './42API/Get42Token';
 import { Engine, Scene, MeshBuilder, Vector3, HemisphericLight, ArcRotateCamera } from '@babylonjs/core';
-
 // Reusable TeamCard Component
 const TeamCard = ({ image, name, description }) => (
   <div className="col-lg-3 col-md-6 mb-4">

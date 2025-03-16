@@ -25,8 +25,6 @@ REACT_PORT = os.getenv('REACT_PORT', '3000')
 # Construct the REDIRECTION_URL dynamically
 REDIRECTION_URL = f"{HTTP_METHOD}://{HOST_NAME}:{REACT_PORT}/home-page"
 
-
-
 @csrf_exempt
 def getToken(request):
     try:
@@ -377,8 +375,7 @@ def updatePassword(request):
         user.save()
         logout(request)
         return JsonResponse({'status': 'success', 'msg': 'Password updated and logged out successfully'}, status=200)
-
-    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405)    
+    return JsonResponse({'status': 'error', 'msg': 'Invalid request method. Only POST is allowed.'}, status=405) 
 
 def updateDescription(request):
     if request.method != "POST":
@@ -760,4 +757,17 @@ def save_game_record(request):
 
     else:
         # Return an error if the request method is not POST
+        return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
+
+
+def fetch_game_records(request):
+    if request.method == 'GET':
+        try:
+            # Retrieve all game records from the database
+            game_records = GameRecord.objects.all().values()  # Get records as dictionaries
+            return JsonResponse({'status': 'success', 'gameRecords': list(game_records)}, safe=False)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+#        return JsonResponse({'status': 'error', 'message': 'Only GET requests are allowed'}, status=405)
         return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
