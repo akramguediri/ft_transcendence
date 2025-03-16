@@ -1,6 +1,6 @@
 const getApiUrl = () => {
     try {
-        const protocol = window.location.protocol || "http:";
+        const protocol = window.location.protocol || "https:";
         let hostname = window.location.hostname || "localhost";
 
         hostname = hostname.replace(/\/$/, "").trim();

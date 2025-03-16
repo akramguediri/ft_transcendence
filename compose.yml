@@ -1,4 +1,3 @@
-
 services:
   frontend:
     build: 
@@ -7,17 +6,21 @@ services:
       target: $STAGE
     container_name: frontend
     ports:
-      - "3000:3000"
       - "80:80"
+      - "443:443"
     volumes:
       - ./debug/frontend/:/debug
     environment:
       - GID=$USER_GID
-      - HTTP_METHOD=${HTTP_METHOD}
-      - HOST_NAME=${HOST_NAME}
+      - HTTP_METHOD=https
+      - HOST_NAME=10.12.1.4
       - REACT_APP_CLIENT_ID=${CLIENT_ID}
-      - REACT_APP_PORT=${REACT_PORT}
-      - REACT_APP_REDIRECT_URI=${REDIRECT_URI}
+      - REACT_APP_PORT=443
+      - REACT_APP_REDIRECT_URI=https://10.12.1.4
+      - REACT_APP_BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+
   backend:
     build: 
       context: backend
@@ -29,8 +32,7 @@ services:
     volumes:
       - ./debug/backend/:/debug
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     env_file:
       - .env
     environment:
@@ -39,9 +41,10 @@ services:
       - DJANGO_SUPERUSER_EMAIL=$DJANGO_EMAIL
       - DJANGO_SUPERUSER_USERNAME=$DJANGO_USERNAME
       - CLIENT_ID=${CLIENT_ID}
-      - REACT_PORT=${REACT_PORT}
-      - HOST_NAME=${HOST_NAME}
-      - HTTP_METHOD=${HTTP_METHOD}
+      - REACT_PORT=443
+      - HOST_NAME=10.12.1.4
+      - HTTP_METHOD=https
+
   db:
     build: 
       context: db
