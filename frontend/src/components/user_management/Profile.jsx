@@ -22,14 +22,13 @@ const Profile = () => {
     const [activeTab, setActiveTab] = useState("status");
     const [friends, setFriends] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
-    const [loadingFriends, setLoadingFriends] = useState(false);
-    const [loadingFriendRequests, setLoadingFriendRequests] = useState(false);
+    const [gameRecords, setGameRecords] = useState([]); // State to store game records
+    const [userStats, setUserStats] = useState({ wins: 0, losses: 0 });
 
     const navigate = useNavigate();
 
     // function for fetch Friend Requests
     const fetchFriendRequests = async () => {
-        setLoadingFriendRequests(true);
         try {
             const response = await fetch(`${API_URL}/usermanagement/fetchfriendrequests`, {
                 method: 'GET',
@@ -38,23 +37,20 @@ const Profile = () => {
                     'X-CSRFToken': getCSRFTokenFromCookies(),
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch friend requests');
             }
-    
+
             const data = await response.json();
             setFriendRequests(data.data.requests);
         } catch (error) {
             console.error('Error fetching friend requests:', error);
-        } finally {
-            setLoadingFriendRequests(false);
         }
     };
 
 
     // function to accept requests from friend
-
     const acceptRequest = async (requestId) => {
         try {
             const response = await fetch(`${API_URL}/usermanagement/acceptfriendrequest`, {
@@ -66,42 +62,16 @@ const Profile = () => {
                 },
                 body: JSON.stringify({ request_id: requestId }),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to accept request');
             }
-    
-            const data = await response.json();
             alert('Friend request accepted');
             fetchFriendRequests(); // Refresh the list
         } catch (error) {
             console.error('Error accepting friend request:', error);
         }
     };
-
-    // const acceptRequest = async (requestId) => {
-    //     try {
-    //         const response = await fetch('http://127.0.0.1:8000/usermanagement/acceptfriendrequest', {
-    //             method: 'POST',
-    //             credentials: 'include',
-    //             headers: {
-    //                 'X-CSRFToken': getCSRFTokenFromCookies(),
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({ request_id: requestId }),
-    //         });
-
-    //         if (!response.ok) {
-    //             throw new Error('Failed to accept request');
-    //         }
-
-    //         const data = await response.json();
-    //         alert('Friend request accepted');
-    //         fetchFriendRequests(); // Refresh the list
-    //     } catch (error) {
-    //         console.error('Error accepting friend request:', error);
-    //     }
-    // };
 
     // function to reject requests from friend
     const rejectRequest = async (requestId) => {
@@ -130,7 +100,6 @@ const Profile = () => {
 
     // function for fetch user friends
     const fetchFriends = async () => {
-        setLoadingFriends(true);
         try {
             const response = await fetch(`${API_URL}/usermanagement/fetchuserfriends`, {
                 method: 'GET',
@@ -139,20 +108,18 @@ const Profile = () => {
                     'X-CSRFToken': getCSRFTokenFromCookies(),
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch friends');
             }
-    
+
             const data = await response.json();
             setFriends(data.data.friends);
         } catch (error) {
             console.error('Error fetching friends:', error);
-        } finally {
-            setLoadingFriends(false);
         }
     };
-    
+
 
 
     const handleNameChange = async () => {
@@ -182,6 +149,65 @@ const Profile = () => {
     const handleAvatarChange = (e) => {
         setAvatarFile(e.target.files[0]);
     };
+
+    const fetchGameRecords = async () => {
+        try {
+            const response = await fetch(`${API_URL}/usermanagement/getGameRecords`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to fetch game records");
+            }
+    
+            const data = await response.json();
+            setGameRecords(data.gameRecords || []);  // Store records
+    
+            if (data.status === "success" && data.gameRecords) {
+                const stats = calculateStats(data.gameRecords);
+                setUserStats(stats);  // Store calculated wins/losses
+            }
+        } catch (error) {
+            console.error("Failed to fetch game records:", error);
+        }
+    };
+    const calculateStats = (gameRecords) => {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        if (!userData || !userData.user_name) {
+            console.error("User not found!");
+            return;
+        }
+        
+        const userName = userData.user_name;
+        let wins = 0;
+        let losses = 0;
+    
+        gameRecords.forEach((game) => {
+            const [score1, score2] = game.result.split("-").map(Number);
+    
+            if (game.player1 === userName) {
+                // If user is Player1, check score1 for wins
+                if (score1 > score2) {
+                    wins++;
+                } else {
+                    losses++;
+                }
+            } else if (game.player2 === userName) {
+                // If user is Player2, check score2 for wins
+                if (score2 > score1) {
+                    wins++;
+                } else {
+                    losses++;
+                }
+            }
+        });
+        return { wins, losses };
+    };
+    
 
     const handleAvatarUpload = async () => {
         if (!avatarFile) {
@@ -233,13 +259,14 @@ const Profile = () => {
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
-            setUserName(user.name);
+            setUserName(user.user_name);
             const avatarUrl = user.avatar ? `${API_URL}${user.avatar}` : `${API_URL}/media/Avatars/default-avatar.png`;
             setUserAvatar(avatarUrl);
         }
         fetchFriends();
         fetchFriendRequests();
-    }, []); // dependencies
+        fetchGameRecords();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -446,18 +473,18 @@ const Profile = () => {
                                 <div className="card-header text-white text-center">Achievement</div>
                                 <div className="card-body text-white">
                                     <div className='d-flex justify-content-between align-items-center'>
-                                        <div >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="gold" className="bi bi-trophy" viewBox="0 0 16 16">
                                                 <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z" />
                                             </svg>
-                                            <h5 className="card-title">3 Wins</h5>
+                                            <h5 className="card-title">{userStats.wins} Wins</h5>
                                         </div>
-                                        <div >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-emoji-frown" viewBox="0 0 16 16">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" className="bi bi-emoji-frown" viewBox="0 0 16 16">
                                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                                                 <path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.5 3.5 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.5 4.5 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
                                             </svg>
-                                            <h5 className="card-title">5 Loses</h5>
+                                            <h5 className="card-title">{userStats.losses} Losses</h5>
                                         </div>
                                     </div>
                                 </div>
@@ -492,15 +519,23 @@ const Profile = () => {
                             </tr>
                         </thead>
                         <tbody className="table-group-divider">
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>1</td>
-                                <td>Ali</td>
-                                <td>Moussa</td>
-                                <td>3 - 2</td>
-                                <td>Ali</td>
-                                <td>Moussa</td>
-                            </tr>
+                            {gameRecords.length > 0 ? (
+                                gameRecords.map((game, index) => (
+                                    <tr key={game.game_id}>
+                                        <th scope="row">{index + 1}</th>
+                                        <td>{game.game_id}</td>
+                                        <td>{game.player1}</td>
+                                        <td>{game.player2}</td>
+                                        <td>{game.result}</td>
+                                        <td>{game.winner}</td>
+                                        <td>{game.loser}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className="text-center">No game records found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
